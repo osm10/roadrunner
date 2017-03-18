@@ -12,4 +12,4 @@ make
 
 ## License
 
-This software is licensed under the MIT license. See `LICENSE` for details.
+This software is licensed under the MIT license. See [LICENSE](./LICENSE) for details.
