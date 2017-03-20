@@ -41,3 +41,22 @@ Shape vc_identify_shape(OVC *blob, float tolerance) {
 
   return obj;
 }
+
+void vc_shape_print(Shape shape) {
+  switch (shape) {
+  case Circle:
+    printf("Circle");
+    break;
+  case Square:
+    printf("Square");
+    break;
+  case Rectangle:
+    printf("Rectangle");
+    break;
+  case Octagon:
+    printf("Octagon");
+    break;
+  default:
+    printf("Unknown shape");
+  }
+}
