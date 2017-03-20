@@ -3,7 +3,7 @@ CFLAGS=-std=c99 -Wall
 LIBS=-lm
 OUTDIR=out
 
-.PHONY: all debug release format clean clean-all
+.PHONY: all debug release format tidy clean clean-all
 
 all: roadrunner clean
 	mkdir -p $(OUTDIR)
@@ -22,6 +22,9 @@ roadrunner: main.o vc.o myvc.o
 
 format:
 	clang-format -style=LLVM -i *.c
+
+tidy:
+	clang-tidy *.[ch] -checks=* -- -std=c99
 
 clean:
 	rm -f *.o
