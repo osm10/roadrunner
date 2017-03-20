@@ -1,3 +1,4 @@
+#include "myvc.h"
 #include <dirent.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -10,6 +11,63 @@
 #define MAXIMAGES 10
 
 static const char *const extensions[] = {"pbm", "pgm", "ppm", "pnm"};
+
+int vc_color_segmentation_fleyeh(IVC *hsv, IVC *out) {
+  if ((hsv->width != out->width) && (hsv->height != out->height))
+    return 0;
+  if ((hsv->channels != 3) || (hsv->channels != out->channels))
+    return 0;
+
+  long pos;
+  int x, y;
+  unsigned char h, s, v;
+
+  for (x = 0; x < hsv->width; x++) {
+    for (y = 0; y < hsv->height; y++) {
+      pos = y * hsv->bytesperline + x * hsv->channels;
+
+      h = hsv->data[pos];
+      s = hsv->data[pos + 1];
+      v = hsv->data[pos + 2];
+      // printf("hsv: %d %d %d\n", h, s, v);
+
+      if (((h > 240) && (h <= 255)) || ((h >= 0) && (h < 10))) {
+        out->data[pos] = 255;
+      }
+      if (s < 40) {
+        out->data[pos] = 0;
+      }
+      if ((v < 30) || (v > 230)) {
+        out->data[pos] = 0;
+      }
+      out->data[pos + 1] = hsv->data[pos + 1];
+      out->data[pos + 2] = hsv->data[pos + 2];
+      // printf("hsv (pos): %d %d %d\n", out->data[pos], out->data[pos+1],
+      // out->data[pos+2]);
+    }
+  }
+
+  return 1;
+}
+
+int process_file(const char *path) {
+  IVC *src = vc_read_image((char *)path);
+  IVC *hsv = vc_rgb_new(src->width, src->height);
+  IVC *segm = vc_rgb_new(src->width, src->height);
+  if (!src || !hsv)
+    return 0;
+  if (vc_rgb_to_hsv(src, hsv) != EXIT_SUCCESS) {
+    fprintf(stderr, "process_file: vc_rgb_to_hsv failed!\n");
+    return 0;
+  }
+  vc_color_segmentation_fleyeh(hsv, segm);
+  vc_write_image_info("out/hsv.ppm", hsv);
+  vc_write_image_info("out/hsv_segm.ppm", segm);
+  vc_image_free(src);
+  vc_image_free(hsv);
+  vc_image_free(segm);
+  return 1;
+}
 
 // TODO: move to utils.c
 char *concat(int count, ...) {
@@ -112,11 +170,12 @@ size_t get_images_from_dir(const char *path, char **images, size_t nimages) {
   return i;
 }
 
-char** alloc_images(size_t nimages, size_t nchar) {
+char **alloc_images(size_t nimages, size_t nchar) {
   char **images = calloc(nimages, sizeof(char *));
-  if (!images) return NULL;
+  if (!images)
+    return NULL;
   for (size_t i = 0; i < nimages; i++) {
-    images[i] = malloc((nchar+1) * sizeof(char));
+    images[i] = malloc((nchar + 1) * sizeof(char));
     // TODO: treat malloc failure
   }
   return images;
@@ -141,7 +200,10 @@ int main(int argc, char *argv[]) {
 
   // testamos se o argumento é um ficheiro
   if (is_regular_file(path)) {
-    // TODO: process_file
+    if (!process_file(path)) {
+      fprintf(stderr, "main: process_file failed\n");
+      return EXIT_FAILURE;
+    }
     return EXIT_SUCCESS;
   }
 
@@ -154,16 +216,16 @@ int main(int argc, char *argv[]) {
     nimages = get_images_from_dir(path, images, MAXIMAGES);
     printf("nimages: %ld\n", nimages);
     if (nimages < 1) {
-       fprintf(stderr, "main: get_images_from_dir found no images\n");
-       free_images(images, MAXIMAGES);
-       return EXIT_FAILURE; 
+      fprintf(stderr, "main: get_images_from_dir found no images\n");
+      free_images(images, MAXIMAGES);
+      return EXIT_FAILURE;
     }
     for (size_t i = 0; i < nimages; i++) {
       printf("image: %s\n", images[i]);
     }
   }
 
-  // libertar o espaço 
+  // libertar o espaço
   free_images(images, MAXIMAGES);
 
   return EXIT_SUCCESS;
