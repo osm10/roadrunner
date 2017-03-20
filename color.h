@@ -12,4 +12,6 @@ typedef enum {
   Green,
 } Color;
 
+void vc_color_print(Color color);
+
 #endif /* COLOR_H */
