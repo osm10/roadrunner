@@ -1,11 +1,11 @@
-#include <stdlib.h>
-#include <string.h>
+#include "utils.h"
 #include <dirent.h>
 #include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "utils.h"
 
 // TODO: move to utils.c
 char *concat(int count, ...) {
@@ -102,4 +102,3 @@ size_t get_images_from_dir(const char *path, char **images, size_t nimages) {
 
   return i;
 }
-

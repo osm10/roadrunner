@@ -1,48 +1,15 @@
 #include "myvc.h"
+#include "sign.h"
 #include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 #define MAXIMAGES 10
 
-sign_color_e vc_find_color(IVC *src) {
-  if (!src) return unknown_color;
-  if (!vc_is_rgb(src)) return unknown_color;
- 
-  IVC *hsv = vc_rgb_new(src->width, src->height);
-  if (!hsv) {
-    return unknown_color;
-  }
-
-  // converter para hsv
-  if (vc_rgb_to_hsv(src, hsv) != EXIT_SUCCESS) {
-    fprintf(stderr, "vc_find_color: vc_rgb_to_hsv failed!\n");
-    return unknown_color;
-  }
-#ifdef DEBUG
-  vc_write_image_info("out/hsv.ppm", hsv);
-#endif
-
-  //calcular o histograma do canal H
-  long pos, hue_hist[256] = { 0 };
-  for (int x = 0; x < hsv->width; x++) {
-    for (int y = 0; y < hsv->height; y++) {
-      pos = y * hsv->bytesperline + x * hsv->channels;
-      hue_hist[hsv->data[pos]]++;
-    }
-  }
-  
-  // identificar a cor dominante no histograma
-  for (int x = 0; x < 256; x++) {
-  }
-
-  return 1; 
-}
-
 int process_file(const char *path) {
   IVC *src = vc_read_image((char *)path);
-  //sign_color_e color = vc_find_color(src);
-  //sign_shape_e shape = vc_find_shape(src);
+  Color color = vc_find_color(src);
+  Shape shape = vc_find_shape(src); // vc_indentify_shape(blob, 0.2f);
   vc_image_free(src);
   return 1;
 }
@@ -69,7 +36,6 @@ void free_images(char *images[], size_t nimages) {
   }
   free(images);
 }
-/*
 int main(int argc, char *argv[]) {
   if (argc < 2) {
     fprintf(stderr, "Error: not enough arguments\n");
@@ -112,7 +78,8 @@ int main(int argc, char *argv[]) {
 
   return EXIT_SUCCESS;
 }
-*/
+
+/*
 int main(void) {
   IVC *image[3];
   int i, nblobs;
@@ -160,3 +127,4 @@ int main(void) {
 
   return 0;
 }
+*/
