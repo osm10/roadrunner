@@ -806,6 +806,7 @@ int vc_gray_to_binary_niblack(IVC *src, IVC *dst, int kernel, float alpha) {
 
   return EXIT_SUCCESS;
 }
+
 int vc_test_gray_to_binary_niblack(int kernel, float alpha) {
   IVC *src = vc_read_image("Images/vc_0005_example1.pgm");
   IVC *dst = vc_grayscale_new(src->width, src->height);
@@ -887,6 +888,87 @@ int vc_test_gray_to_binary_local_mean(int kernel) {
   vc_image_free(src);
   vc_image_free(dst);
   return EXIT_SUCCESS;
+}
+
+int vc_histogram_grayscale(IVC *src, long hist[]) {
+  if (!src)
+    return EXIT_FAILURE;
+
+  memset(hist, 0, sizeof(long) * 255);
+
+  long i, size = src->width * src->height;
+  for (i = 0; i < size; i++) {
+    hist[src->data[i]]++;
+  }
+
+  return EXIT_SUCCESS;
+}
+
+// Otsu's thresholding method using inter-class variance
+int vc_gray_to_binary_otsu(IVC *src, IVC *dst) {
+  if (!vc_is_grayscale(src))
+    return EXIT_FAILURE;
+  if (!vc_is_grayscale(dst))
+    return EXIT_FAILURE;
+  if ((src->width != dst->width) || (src->height != dst->height))
+    return EXIT_FAILURE;
+
+  long int hist[256];
+  double prob[256];
+  int sumb, sumf;
+  double wb, wf, mb, mf, between;
+  int ideal_th = 0;
+  double max = 0.0;
+  int i;
+  int threshold;
+
+  // histogram generation
+  if (vc_histogram_grayscale(src, hist) != EXIT_SUCCESS)
+    return EXIT_FAILURE;
+
+  // calculation of probability density
+  for (i = 0; i < 256; i++) {
+    prob[i] = (double)hist[i] / (src->width * src->height);
+  }
+
+  for (threshold = 0; threshold < 255; threshold++) {
+    sumb = 0;
+    sumf = 0;
+    wb = 0.0;
+    wf = 0.0;
+    mb = 0.0;
+    mf = 0.0;
+    between = 0.0;
+
+    for (i = 0; i < threshold; i++) {
+      wb += prob[i];
+      mb += i * hist[i];
+      sumb += hist[i];
+    }
+    if (mb != 0)
+      mb = mb / sumb;
+
+    for (i = threshold; i < 255; i++) {
+      wf += prob[i];
+      mf += i * hist[i];
+      sumf += hist[i];
+    }
+    if (mf != 0)
+      mf = mf / sumf;
+
+    between = wb * wf * pow(mf - mb, 2);
+
+    if (between > max) {
+      max = between;
+      ideal_th = threshold;
+    }
+  }
+
+#ifdef DEBUG
+  printf("Otsu's threshold: %d\n", ideal_th);
+#endif
+
+  return vc_gray_to_binary_fixed(src, dst, ideal_th);
 }
 
 // Morphological Operators (Grayscale)

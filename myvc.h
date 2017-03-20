@@ -63,6 +63,7 @@ int vc_gray_to_binary_bernsen(IVC *src, IVC *dst, int kernel, int c_min);
 int vc_test_gray_to_binary_bernsen(int kernel, int c_min);
 int vc_gray_to_binary_niblack(IVC *src, IVC *dst, int kernel, float alpha);
 int vc_test_gray_to_binary_niblack(int kernel, float alpha);
+int vc_gray_to_binary_otsu(IVC *src, IVC *dst);
 
 // Morphological Operators (Binary)
 int vc_binary_dilate(IVC *src, IVC* dst, int size);
@@ -100,5 +101,8 @@ void benchmark_compare_functions(int (*vc_fn1)(IVC *, IVC *), char *fn1_name, in
 
 // Testing utilities
 int vc_test_binary_function(char* filepath, imagetype_e type, int (*vc_fn)(IVC*, IVC*), char* fn_name);
+
+
+int vc_histogram_grayscale(IVC *src, long hist[]);
 
 #endif /* MYVC */
