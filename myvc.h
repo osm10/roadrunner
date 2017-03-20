@@ -88,6 +88,7 @@ int vc_test_gray_close(int size_erode, int size_dilate);
 OVC *vc_binary_blob_labelling(IVC *src, IVC *dst, int *nlabels);
 int vc_binary_blob_info(IVC *src, OVC *blobs, int nblobs);
 int vc_binary_blob_print(OVC *blob);
+int vc_binary_blob_filter(OVC **blobs, int nblobs, int area);
 int vc_draw_boundary_box(IVC *src, int x_min, int x_max, int y_min, int y_max, int color);
 int vc_draw_mass_center(IVC *src, int xc, int yc, int color);
 

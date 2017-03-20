@@ -1550,8 +1550,9 @@ OVC *vc_binary_blob_labelling(IVC *src, IVC *dst, int *nlabels) {
   if (blobs != NULL) {
     for (a = 0; a < (*nlabels); a++)
       blobs[a].label = labeltable[a];
-  } else
+  } else {
     return NULL;
+  }
 
   return blobs;
 }
@@ -1632,4 +1633,34 @@ int vc_binary_blob_info(IVC *src, OVC *blobs, int nblobs) {
   }
 
   return 1;
+}
+
+// Filtra todos os blobs a baixo de `area`.
+int vc_binary_blob_filter(OVC **blobs, int nblobs, int area) {
+  if (!blobs) return -1;
+  if (nblobs < 1) return -1;
+
+  OVC *in = *blobs;
+  int i, j = 0, nfblobs = 0;
+
+  for (i = 0; i < nblobs; i++) {
+    if (in[i].area > area) {
+      nfblobs++;
+    }
+  }
+
+  OVC *fblobs = malloc(sizeof(OVC[nfblobs]));
+  if (!fblobs) return -1;
+
+  for (i = 0; i < nblobs; i++) {
+    if (in[i].area > area) {
+      fblobs[j] = in[i];
+      j++;
+    }
+  }
+
+  free(*blobs);
+  *blobs = fblobs;
+
+  return nfblobs;
 }
