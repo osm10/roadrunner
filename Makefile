@@ -14,8 +14,8 @@ debug: all
 release: CFLAGS += -O2
 release: all
 
-roadrunner: main.o vc.o myvc.o
-	$(CC) $(CFLAGS) main.o vc.o myvc.o -o roadrunner $(LIBS)
+roadrunner: main.o vc.o myvc.o utils.o
+	$(CC) $(CFLAGS) main.o vc.o myvc.o utils.o -o roadrunner $(LIBS)
 
 .c.o: vc.h
 	$(CC) $(CFLAGS) -c $<
