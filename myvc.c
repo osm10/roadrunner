@@ -1719,8 +1719,10 @@ int vc_binary_blob_info(IVC *src, OVC *blobs, int nblobs) {
 
 // Filtra todos os blobs a baixo de `area`.
 int vc_binary_blob_filter(OVC **blobs, int nblobs, int area) {
-  if (!blobs) return -1;
-  if (nblobs < 1) return -1;
+  if (!blobs)
+    return -1;
+  if (nblobs < 1)
+    return -1;
 
   OVC *in = *blobs;
   int i, j = 0, nfblobs = 0;
@@ -1732,7 +1734,8 @@ int vc_binary_blob_filter(OVC **blobs, int nblobs, int area) {
   }
 
   OVC *fblobs = malloc(sizeof(OVC[nfblobs]));
-  if (!fblobs) return -1;
+  if (!fblobs)
+    return -1;
 
   for (i = 0; i < nblobs; i++) {
     if (in[i].area > area) {
