@@ -55,3 +55,7 @@ dkms.conf
 [._]*.sw[a-p]
 [._]s[a-v][a-z]
 [._]sw[a-p]
+
+# Roadrunner
+out
+roadrunner
