@@ -104,10 +104,8 @@ size_t get_images_from_dir(const char *path, char **images, size_t nimages) {
 }
 
 void fatal(const char *msg) {
-  fprintf(stderr, "%s\n", msg);
+  fprintf(stderr, "%s", msg);
   exit(1);
 }
 
-void error(const char *msg) {
-  fprintf(stderr, "%s\n", msg);
-}
+void error(const char *msg) { fprintf(stderr, "%s", msg); }
