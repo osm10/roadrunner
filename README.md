@@ -6,8 +6,8 @@ Roadrunner detects and identifies traffic signs.
 ## Usage
 
 ```sh
-make
-./roadrunner samples/lenna.ppm
+$ make
+$ ./roadrunner samples/stop.ppm
 ```
 
 ## License
