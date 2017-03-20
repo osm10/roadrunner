@@ -5,6 +5,8 @@
 
 static const char *const extensions[] = {"pbm", "pgm", "ppm", "pnm"};
 
+void fatal(const char* message);
+void error(const char* message);
 char *concat(int count, ...);
 int is_regular_file(const char *path);
 int is_directory(const char *path);
