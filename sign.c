@@ -2,7 +2,7 @@
 #include "stdlib.h"
 #include "utils.h"
 
-// Sinais de transito conhecidos
+// Sinais de transito conhecidos.
 Sign known_signs[7] = {
     {"Arrow Left", Circle, Blue}, {"Arrow Right", Circle, Blue},
     {"Arrow Up", Circle, Blue},   {"Highway", Square, Blue},
@@ -10,6 +10,7 @@ Sign known_signs[7] = {
     {"Stop", Octagon, Red},
 };
 
+// Determina a cor dominante de uma dada imagem RGB.
 Color vc_find_color(IVC *src) {
   if (!src)
     fatal("vc_find_color: src == null\n");
@@ -22,7 +23,7 @@ Color vc_find_color(IVC *src) {
   }
 
   // converter a imagem de entrada para HSV
-  if (vc_rgb_to_hsv(src, hsv) != EXIT_SUCCESS) {
+  if (!vc_rgb_to_hsv(src, hsv)) {
     fatal("vc_find_color: vc_rgb_to_hsv failed!\n");
   }
 
@@ -47,6 +48,7 @@ Color vc_find_color(IVC *src) {
   return UnknownColor;
 }
 
+// Determina a forma do sinal.
 Shape vc_find_shape(IVC *src) {
   if (!src) {
     fatal("vc_find_shape: src == null\n");

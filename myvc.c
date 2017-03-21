@@ -8,7 +8,7 @@
 
 int vc_gray_negative(IVC *image) {
   if (!vc_is_grayscale(image))
-    return EXIT_FAILURE;
+    return 0;
 
   long pos;
 
@@ -20,21 +20,21 @@ int vc_gray_negative(IVC *image) {
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_gray_negative() {
   IVC *gray = vc_read_image("Images/FLIR/flir-01.pgm");
-  if (vc_gray_negative(gray) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_gray_negative(gray) != 1)
+    return 0;
   vc_write_image_info("out/vc_gray_negative_flir-01.pgm", gray);
   vc_image_free(gray);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_rgb_negative(IVC *image) {
   if (!vc_is_rgb(image))
-    return EXIT_FAILURE;
+    return 0;
 
   long pos;
 
@@ -48,22 +48,22 @@ int vc_rgb_negative(IVC *image) {
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_rgb_negative() {
   IVC *rgb = vc_read_image("Images/Additional/cablecar.ppm");
-  if (vc_rgb_negative(rgb) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_rgb_negative(rgb) != 1)
+    return 0;
   vc_write_image_info("out/vc_rgb_negative_cablecar.ppm", rgb);
   vc_image_free(rgb);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 // Get the red component of a rgb image
 int vc_rgb_get_red_gray(IVC *image) {
   if (!vc_is_rgb(image))
-    return EXIT_FAILURE;
+    return 0;
 
   long pos = 0;
 
@@ -76,22 +76,22 @@ int vc_rgb_get_red_gray(IVC *image) {
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_rgb_get_red_gray() {
   IVC *rgb = vc_read_image("Images/Classic/lenna.ppm");
-  if (vc_rgb_get_red_gray(rgb) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_rgb_get_red_gray(rgb) != 1)
+    return 0;
   vc_write_image_info("out/vc_rgb_get_red_gray_lenna.ppm", rgb);
   vc_image_free(rgb);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 // Get the green component of a rgb image
 int vc_rgb_get_green_gray(IVC *image) {
   if (!vc_is_rgb(image))
-    return EXIT_FAILURE;
+    return 0;
 
   long pos = 0;
 
@@ -104,22 +104,22 @@ int vc_rgb_get_green_gray(IVC *image) {
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_rgb_get_green_gray() {
   IVC *rgb = vc_read_image("Images/Classic/lenna.ppm");
-  if (vc_rgb_get_green_gray(rgb) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_rgb_get_green_gray(rgb) != 1)
+    return 0;
   vc_write_image_info("out/vc_rgb_get_green_gray_lenna.ppm", rgb);
   vc_image_free(rgb);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 // Get the blue component of a rgb image
 int vc_rgb_get_blue_gray(IVC *image) {
   if (!vc_is_rgb(image))
-    return EXIT_FAILURE;
+    return 0;
 
   long pos = 0;
 
@@ -132,29 +132,29 @@ int vc_rgb_get_blue_gray(IVC *image) {
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_rgb_get_blue_gray() {
   IVC *rgb = vc_read_image("Images/Classic/lenna.ppm");
-  if (vc_rgb_get_blue_gray(rgb) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_rgb_get_blue_gray(rgb) != 1)
+    return 0;
   vc_write_image_info("out/vc_rgb_get_blue_gray_lenna.ppm", rgb);
   vc_image_free(rgb);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 // Convert and rgb image to a grayscale image
 int vc_rgb_to_gray(IVC *rgb, IVC *gray) {
   if (!vc_is_rgb(rgb))
-    return EXIT_FAILURE;
+    return 0;
   if (!vc_is_grayscale(gray))
-    return EXIT_FAILURE;
+    return 0;
 
   /* se os tamanhos das imagens não forem iguais
 não podemos fazer a conversão */
   if (rgb->width != gray->width || rgb->height != gray->height)
-    return EXIT_FAILURE;
+    return 0;
 
   long pos_rgb = 0, pos_gray = 0;
 
@@ -170,7 +170,7 @@ não podemos fazer a conversão */
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_rgb_to_gray() {
@@ -180,17 +180,17 @@ int vc_test_rgb_to_gray() {
 
 int vc_rgb_to_hsv(IVC *rgb, IVC *hsv) {
   if (!vc_is_rgb(rgb))
-    return EXIT_FAILURE;
+    return 0;
 
   /* como o número de canais e intensidade é o mesmo em RGB e HSV
 usamos a função vc_is_rgb para testar se a imagem é HSV */
   if (!vc_is_rgb(hsv))
-    return EXIT_FAILURE;
+    return 0;
 
   /* se os tamanhos das imagens não forem iguais
 não podemos fazer a conversão */
   if (rgb->width != hsv->width || rgb->height != hsv->height)
-    return EXIT_FAILURE;
+    return 0;
 
   long pos = 0;
   unsigned char r, g, b;
@@ -252,7 +252,7 @@ não podemos fazer a conversão */
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_rgb_to_hsv() {
@@ -263,12 +263,12 @@ int vc_test_rgb_to_hsv() {
 // Convert a grayscale image to a rgb image.
 int vc_scale_gray_to_rgb(IVC *gray, IVC *rgb) {
   if (!vc_is_grayscale(gray))
-    return EXIT_FAILURE;
+    return 0;
   if (!vc_is_rgb(rgb))
-    return EXIT_FAILURE;
+    return 0;
 
   if ((gray->width != rgb->width) || (gray->height != rgb->height))
-    return EXIT_FAILURE;
+    return 0;
 
   long pos_gray, pos_rgb;
   unsigned char pixel;
@@ -306,17 +306,17 @@ int vc_scale_gray_to_rgb(IVC *gray, IVC *rgb) {
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_scale_gray_to_rgb2(IVC *gray, IVC *rgb) {
   if (!vc_is_grayscale(gray))
-    return EXIT_FAILURE;
+    return 0;
   if (!vc_is_rgb(rgb))
-    return EXIT_FAILURE;
+    return 0;
 
   if ((gray->width != rgb->width) || (gray->height != rgb->height))
-    return EXIT_FAILURE;
+    return 0;
 
   long pos_gray, pos_rgb;
   unsigned char pixel;
@@ -353,7 +353,7 @@ int vc_scale_gray_to_rgb2(IVC *gray, IVC *rgb) {
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 // Convert a grayscale image to a rgb image.
@@ -370,12 +370,12 @@ int vc_test_scale_gray_to_rgb2() {
 
 int vc_gray_to_binary(IVC *gray, IVC *bin) {
   if (!vc_is_grayscale(gray))
-    return EXIT_FAILURE;
+    return 0;
   if (!vc_is_binary(bin))
-    return EXIT_FAILURE;
+    return 0;
 
   if ((gray->width != bin->width) || (gray->height != bin->height))
-    return EXIT_FAILURE;
+    return 0;
 
   int x, y;
   long pos;
@@ -392,39 +392,39 @@ int vc_gray_to_binary(IVC *gray, IVC *bin) {
         fprintf(stderr, "vc_gray_to_binary: can't convert pixel with a value "
                         "of %d, only 0 or 255",
                 gray->data[pos]);
-        return EXIT_FAILURE;
+        return 0;
       }
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_gray_to_binary() {
   IVC *src = vc_read_image("Images/Classic/barbara.pgm");
   IVC *gray = vc_grayscale_new(src->width, src->height);
-  if (vc_gray_to_binary_global_mean(src, gray) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_gray_to_binary_global_mean(src, gray) != 1)
+    return 0;
   IVC *bin = vc_binary_new(gray->width, gray->height);
-  if (vc_gray_to_binary(gray, bin) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_gray_to_binary(gray, bin) != 1)
+    return 0;
   vc_write_image_info("out/vc_gray_to_binary_barbara.pbm", bin);
   vc_image_free(src);
   vc_image_free(gray);
   vc_image_free(bin);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 // Image segmentation by fixed threshold value.
 int vc_gray_to_binary_fixed(IVC *graysrc, IVC *graydst, int threshold) {
   if (!vc_is_grayscale(graysrc))
-    return EXIT_FAILURE;
+    return 0;
   if (!vc_is_grayscale(graydst))
-    return EXIT_FAILURE;
+    return 0;
 
   if ((graysrc->width != graydst->width) ||
       (graysrc->height != graydst->height))
-    return EXIT_FAILURE;
+    return 0;
 
   long pos;
 
@@ -440,30 +440,30 @@ int vc_gray_to_binary_fixed(IVC *graysrc, IVC *graydst, int threshold) {
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_gray_to_binary_fixed(int threshold) {
   IVC *src = vc_read_image("Images/vc_0005_example1.pgm");
   IVC *dst = vc_grayscale_new(src->width, src->height);
-  if (vc_gray_to_binary_fixed(src, dst, threshold) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_gray_to_binary_fixed(src, dst, threshold) != 1)
+    return 0;
   vc_write_image_info("out/vc_gray_to_binary_fixed_vc_0005_example1.pgm", dst);
   vc_image_free(src);
   vc_image_free(dst);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 // Image segmentation by global mean value.
 int vc_gray_to_binary_global_mean(IVC *graysrc, IVC *graydst) {
   if (!vc_is_grayscale(graysrc))
-    return EXIT_FAILURE;
+    return 0;
   if (!vc_is_grayscale(graydst))
-    return EXIT_FAILURE;
+    return 0;
 
   if ((graysrc->width != graydst->width) ||
       (graysrc->height != graydst->height))
-    return EXIT_FAILURE;
+    return 0;
 
   int x, y;
   long pos;
@@ -496,7 +496,7 @@ int vc_gray_to_binary_global_mean(IVC *graysrc, IVC *graydst) {
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_gray_to_binary_global_mean() {
@@ -507,13 +507,13 @@ int vc_test_gray_to_binary_global_mean() {
 
 int vc_gray_to_binary_russ(IVC *graysrc, IVC *graydst, float alpha) {
   if (!vc_is_grayscale(graysrc))
-    return EXIT_FAILURE;
+    return 0;
   if (!vc_is_grayscale(graydst))
-    return EXIT_FAILURE;
+    return 0;
 
   if ((graysrc->width != graydst->width) ||
       (graysrc->height != graydst->height))
-    return EXIT_FAILURE;
+    return 0;
 
   int x, y;
   long pos;
@@ -563,24 +563,24 @@ int vc_gray_to_binary_russ(IVC *graysrc, IVC *graydst, float alpha) {
 int vc_test_gray_to_binary_russ(float alpha) {
   IVC *src = vc_read_image("Images/vc_0005_example1.pgm");
   IVC *dst = vc_grayscale_new(src->width, src->height);
-  if (vc_gray_to_binary_russ(src, dst, alpha) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_gray_to_binary_russ(src, dst, alpha) != 1)
+    return 0;
   vc_write_image_info("out/vc_gray_to_binary_russ_vc_0005_example1.pgm", dst);
   vc_image_free(src);
   vc_image_free(dst);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_gray_to_binary_midpoint(IVC *src, IVC *dst, int kernel) {
   if (!vc_is_grayscale(src))
-    return EXIT_FAILURE;
+    return 0;
   if (!vc_is_grayscale(dst))
-    return EXIT_FAILURE;
+    return 0;
   if (kernel % 2 != 1) // TODO: check if this is correct
-    return EXIT_FAILURE;
+    return 0;
 
   if ((src->width != dst->width) || (src->height != dst->height))
-    return EXIT_FAILURE;
+    return 0;
 
   long pos, pos_k;
   int threshold, v_min = 255, v_max = 0;
@@ -633,33 +633,33 @@ int vc_gray_to_binary_midpoint(IVC *src, IVC *dst, int kernel) {
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_gray_to_binary_midpoint(int kernel) {
   IVC *src = vc_read_image("Images/vc_0005_example1.pgm");
   IVC *dst = vc_grayscale_new(src->width, src->height);
-  if (vc_gray_to_binary_midpoint(src, dst, kernel) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_gray_to_binary_midpoint(src, dst, kernel) != 1)
+    return 0;
   vc_write_image_info("out/vc_gray_to_binary_midpoint_vc_0005_example1.pgm",
                       dst);
   vc_image_free(src);
   vc_image_free(dst);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_gray_to_binary_bernsen(IVC *src, IVC *dst, int kernel, int c_min) {
   if (!vc_is_grayscale(src))
-    return EXIT_FAILURE;
+    return 0;
   if (!vc_is_grayscale(dst))
-    return EXIT_FAILURE;
+    return 0;
   if (kernel % 2 != 1) // TODO: check if this is correct
-    return EXIT_FAILURE;
+    return 0;
   if (c_min < 1)
-    return EXIT_FAILURE;
+    return 0;
 
   if ((src->width != dst->width) || (src->height != dst->height))
-    return EXIT_FAILURE;
+    return 0;
 
   long pos, pos_k;
   int threshold, v_min = 255, v_max = 0;
@@ -711,31 +711,31 @@ int vc_gray_to_binary_bernsen(IVC *src, IVC *dst, int kernel, int c_min) {
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_gray_to_binary_bernsen(int kernel, int c_min) {
   IVC *src = vc_read_image("Images/vc_0005_example1.pgm");
   IVC *dst = vc_grayscale_new(src->width, src->height);
-  if (vc_gray_to_binary_bernsen(src, dst, kernel, c_min) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_gray_to_binary_bernsen(src, dst, kernel, c_min) != 1)
+    return 0;
   vc_write_image_info("out/vc_gray_to_binary_bernsen_vc_0005_example1.pgm",
                       dst);
   vc_image_free(src);
   vc_image_free(dst);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_gray_to_binary_niblack(IVC *src, IVC *dst, int kernel, float alpha) {
   if (!vc_is_grayscale(src))
-    return EXIT_FAILURE;
+    return 0;
   if (!vc_is_grayscale(dst))
-    return EXIT_FAILURE;
+    return 0;
   if (kernel % 2 != 1) // TODO: check if this is correct
-    return EXIT_FAILURE;
+    return 0;
 
   if ((src->width != dst->width) || (src->height != dst->height))
-    return EXIT_FAILURE;
+    return 0;
 
   long pos, pos_k;
   int tmp, threshold;
@@ -804,31 +804,31 @@ int vc_gray_to_binary_niblack(IVC *src, IVC *dst, int kernel, float alpha) {
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_gray_to_binary_niblack(int kernel, float alpha) {
   IVC *src = vc_read_image("Images/vc_0005_example1.pgm");
   IVC *dst = vc_grayscale_new(src->width, src->height);
-  if (vc_gray_to_binary_niblack(src, dst, kernel, alpha) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_gray_to_binary_niblack(src, dst, kernel, alpha) != 1)
+    return 0;
   vc_write_image_info("out/vc_gray_to_binary_niblack_vc_0005_example1.pgm",
                       dst);
   vc_image_free(src);
   vc_image_free(dst);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_gray_to_binary_local_mean(IVC *src, IVC *dst, int kernel) {
   if (!vc_is_grayscale(src))
-    return EXIT_FAILURE;
+    return 0;
   if (!vc_is_grayscale(dst))
-    return EXIT_FAILURE;
+    return 0;
   if (kernel % 2 != 1) // TODO: check if this is correct
-    return EXIT_FAILURE;
+    return 0;
 
   if ((src->width != dst->width) || (src->height != dst->height))
-    return EXIT_FAILURE;
+    return 0;
 
   long pos, pos_k;
   int threshold;
@@ -875,24 +875,24 @@ int vc_gray_to_binary_local_mean(IVC *src, IVC *dst, int kernel) {
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_gray_to_binary_local_mean(int kernel) {
   IVC *src = vc_read_image("Images/vc_0005_example1.pgm");
   IVC *dst = vc_grayscale_new(src->width, src->height);
-  if (vc_gray_to_binary_local_mean(src, dst, kernel) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_gray_to_binary_local_mean(src, dst, kernel) != 1)
+    return 0;
   vc_write_image_info("out/vc_gray_to_binary_local_mean_vc_0005_example1.pgm",
                       dst);
   vc_image_free(src);
   vc_image_free(dst);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_histogram_grayscale(IVC *src, long hist[]) {
   if (!src)
-    return EXIT_FAILURE;
+    return 0;
 
   memset(hist, 0, sizeof(long) * 255);
 
@@ -901,17 +901,17 @@ int vc_histogram_grayscale(IVC *src, long hist[]) {
     hist[src->data[i]]++;
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 // Otsu's thresholding method using inter-class variance
 int vc_gray_to_binary_otsu(IVC *src, IVC *dst) {
   if (!vc_is_grayscale(src))
-    return EXIT_FAILURE;
+    return 0;
   if (!vc_is_grayscale(dst))
-    return EXIT_FAILURE;
+    return 0;
   if ((src->width != dst->width) || (src->height != dst->height))
-    return EXIT_FAILURE;
+    return 0;
 
   long int hist[256];
   double prob[256];
@@ -923,8 +923,8 @@ int vc_gray_to_binary_otsu(IVC *src, IVC *dst) {
   int threshold;
 
   // histogram generation
-  if (vc_histogram_grayscale(src, hist) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_histogram_grayscale(src, hist) != 1)
+    return 0;
 
   // calculation of probability density
   for (i = 0; i < 256; i++) {
@@ -974,9 +974,9 @@ int vc_gray_to_binary_otsu(IVC *src, IVC *dst) {
 // Morphological Operators (Grayscale)
 int vc_binary_dilate(IVC *src, IVC *dst, int size) {
   if ((src->width != dst->width) || (src->height != dst->height))
-    return EXIT_FAILURE;
+    return 0;
   if (size < 1)
-    return EXIT_FAILURE;
+    return 0;
 
   long pos, pos_k;
   int x, y, kx, ky;
@@ -1012,30 +1012,30 @@ int vc_binary_dilate(IVC *src, IVC *dst, int size) {
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_binary_dilate(int size) {
   IVC *src = vc_read_image("Images/FLIR/flir-01.pgm");
   IVC *bin = vc_grayscale_new(src->width, src->height);
   IVC *dst = vc_grayscale_new(src->width, src->height);
-  if (vc_gray_to_binary_global_mean(src, bin) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_gray_to_binary_global_mean(src, bin) != 1)
+    return 0;
   vc_write_image_info("out/vc_test_binary_dilate_flir-01_bin.pgm", bin);
-  if (vc_binary_dilate(bin, dst, size) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_binary_dilate(bin, dst, size) != 1)
+    return 0;
   vc_write_image_info("out/vc_test_binary_dilate_flir-01.pgm", dst);
   vc_image_free(src);
   vc_image_free(bin);
   vc_image_free(dst);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_binary_erode(IVC *src, IVC *dst, int size) {
   if ((src->width != dst->width) || (src->height != dst->height))
-    return EXIT_FAILURE;
+    return 0;
   if (size < 1)
-    return EXIT_FAILURE;
+    return 0;
 
   long pos, pos_k;
   int x, y, kx, ky;
@@ -1071,90 +1071,90 @@ int vc_binary_erode(IVC *src, IVC *dst, int size) {
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_binary_erode(int size) {
   IVC *src = vc_read_image("Images/FLIR/flir-01.pgm");
   IVC *bin = vc_grayscale_new(src->width, src->height);
   IVC *dst = vc_grayscale_new(src->width, src->height);
-  if (vc_gray_to_binary_global_mean(src, bin) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_gray_to_binary_global_mean(src, bin) != 1)
+    return 0;
   vc_write_image_info("out/vc_test_binary_erode_flir-01_bin.pgm", bin);
-  if (vc_binary_erode(bin, dst, size) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_binary_erode(bin, dst, size) != 1)
+    return 0;
   vc_write_image_info("out/vc_test_binary_erode_flir-01.pgm", dst);
   vc_image_free(src);
   vc_image_free(bin);
   vc_image_free(dst);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_binary_open(IVC *src, IVC *dst, int size_erode, int size_dilate) {
   if ((src->width != dst->width) || (src->height != dst->height))
-    return EXIT_FAILURE;
+    return 0;
   IVC *tmp = vc_grayscale_new(src->width, src->height);
-  if (vc_binary_erode(src, tmp, size_erode) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
-  if (vc_binary_dilate(tmp, dst, size_dilate) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
-  return EXIT_SUCCESS;
+  if (vc_binary_erode(src, tmp, size_erode) != 1)
+    return 0;
+  if (vc_binary_dilate(tmp, dst, size_dilate) != 1)
+    return 0;
+  return 1;
 }
 
 int vc_test_binary_open(int size_erode, int size_dilate) {
   IVC *src = vc_read_image("Images/FLIR/flir-01.pgm");
   IVC *bin = vc_grayscale_new(src->width, src->height);
   IVC *dst = vc_grayscale_new(src->width, src->height);
-  if (vc_gray_to_binary_global_mean(src, bin) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_gray_to_binary_global_mean(src, bin) != 1)
+    return 0;
   vc_write_image_info("out/vc_test_binary_open_flir-01_bin.pgm", bin);
-  if (vc_binary_open(bin, dst, size_erode, size_dilate) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_binary_open(bin, dst, size_erode, size_dilate) != 1)
+    return 0;
   vc_write_image_info("out/vc_test_binary_open_flir-01.pgm", dst);
   vc_image_free(src);
   vc_image_free(bin);
   vc_image_free(dst);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_binary_close(IVC *src, IVC *dst, int size_erode, int size_dilate) {
   if ((src->width != dst->width) || (src->height != dst->height))
-    return EXIT_FAILURE;
+    return 0;
   IVC *tmp = vc_grayscale_new(src->width, src->height);
-  if (vc_binary_dilate(src, tmp, size_dilate) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
-  if (vc_binary_erode(tmp, dst, size_erode) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
-  return EXIT_SUCCESS;
+  if (vc_binary_dilate(src, tmp, size_dilate) != 1)
+    return 0;
+  if (vc_binary_erode(tmp, dst, size_erode) != 1)
+    return 0;
+  return 1;
 }
 
 int vc_test_binary_close(int size_erode, int size_dilate) {
   IVC *src = vc_read_image("Images/FLIR/flir-01.pgm");
   IVC *bin = vc_grayscale_new(src->width, src->height);
   IVC *dst = vc_grayscale_new(src->width, src->height);
-  if (vc_gray_to_binary_global_mean(src, bin) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_gray_to_binary_global_mean(src, bin) != 1)
+    return 0;
   vc_write_image_info("out/vc_test_binary_close_flir-01_bin.pgm", bin);
-  if (vc_binary_close(bin, dst, size_erode, size_dilate) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_binary_close(bin, dst, size_erode, size_dilate) != 1)
+    return 0;
   vc_write_image_info("out/vc_test_binary_close_flir-01.pgm", dst);
   vc_image_free(src);
   vc_image_free(bin);
   vc_image_free(dst);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 // Morphological Operators (Grayscale)
 
 int vc_gray_dilate(IVC *src, IVC *dst, int size) {
   if (!vc_is_grayscale(src))
-    return EXIT_FAILURE;
+    return 0;
   if (!vc_is_grayscale(dst))
-    return EXIT_FAILURE;
+    return 0;
   if ((src->width != dst->width) || (src->height != dst->height))
-    return EXIT_FAILURE;
+    return 0;
   if (size < 1)
-    return EXIT_FAILURE;
+    return 0;
 
   long pos, pos_k;
   int x, y, kx, ky;
@@ -1193,29 +1193,29 @@ int vc_gray_dilate(IVC *src, IVC *dst, int size) {
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_gray_dilate(int size) {
   IVC *src = vc_read_image("Images/Special/testpat.pgm");
   IVC *dst = vc_grayscale_new(src->width, src->height);
-  if (vc_gray_dilate(src, dst, size) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_gray_dilate(src, dst, size) != 1)
+    return 0;
   vc_write_image_info("out/vc_test_gray_dilate_testpat.pgm", dst);
   vc_image_free(src);
   vc_image_free(dst);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_gray_erode(IVC *src, IVC *dst, int size) {
   if (!vc_is_grayscale(src))
-    return EXIT_FAILURE;
+    return 0;
   if (!vc_is_grayscale(dst))
-    return EXIT_FAILURE;
+    return 0;
   if ((src->width != dst->width) || (src->height != dst->height))
-    return EXIT_FAILURE;
+    return 0;
   if (size < 1)
-    return EXIT_FAILURE;
+    return 0;
 
   long pos, pos_k;
   int x, y, kx, ky;
@@ -1254,69 +1254,69 @@ int vc_gray_erode(IVC *src, IVC *dst, int size) {
     }
   }
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_test_gray_erode(int size) {
   IVC *src = vc_read_image("Images/Special/testpat.pgm");
   IVC *dst = vc_grayscale_new(src->width, src->height);
-  if (vc_gray_erode(src, dst, size) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_gray_erode(src, dst, size) != 1)
+    return 0;
   vc_write_image_info("out/vc_test_gray_erode_testpat.pgm", dst);
   vc_image_free(src);
   vc_image_free(dst);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_gray_open(IVC *src, IVC *dst, int size_erode, int size_dilate) {
   if ((src->width != dst->width) || (src->height != dst->height))
-    return EXIT_FAILURE;
+    return 0;
   IVC *tmp = vc_grayscale_new(src->width, src->height);
-  if (vc_gray_erode(src, tmp, size_erode) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
-  if (vc_gray_dilate(tmp, dst, size_dilate) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
-  return EXIT_SUCCESS;
+  if (vc_gray_erode(src, tmp, size_erode) != 1)
+    return 0;
+  if (vc_gray_dilate(tmp, dst, size_dilate) != 1)
+    return 0;
+  return 1;
 }
 
 int vc_test_gray_open(int size_erode, int size_dilate) {
   IVC *src = vc_read_image("Images/Special/testpat.pgm");
   IVC *dst = vc_grayscale_new(src->width, src->height);
-  if (vc_gray_open(src, dst, size_erode, size_dilate) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_gray_open(src, dst, size_erode, size_dilate) != 1)
+    return 0;
   vc_write_image_info("out/vc_test_gray_open_testpat.pgm", dst);
   vc_image_free(src);
   vc_image_free(dst);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_gray_close(IVC *src, IVC *dst, int size_erode, int size_dilate) {
   if ((src->width != dst->width) || (src->height != dst->height))
-    return EXIT_FAILURE;
+    return 0;
   IVC *tmp = vc_grayscale_new(src->width, src->height);
-  if (vc_gray_dilate(src, tmp, size_dilate) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
-  if (vc_gray_erode(tmp, dst, size_erode) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
-  return EXIT_SUCCESS;
+  if (vc_gray_dilate(src, tmp, size_dilate) != 1)
+    return 0;
+  if (vc_gray_erode(tmp, dst, size_erode) != 1)
+    return 0;
+  return 1;
 }
 
 int vc_test_gray_close(int size_erode, int size_dilate) {
   IVC *src = vc_read_image("Images/Special/testpat.pgm");
   IVC *dst = vc_grayscale_new(src->width, src->height);
-  if (vc_gray_close(src, dst, size_erode, size_dilate) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if (vc_gray_close(src, dst, size_erode, size_dilate) != 1)
+    return 0;
   vc_write_image_info("out/vc_test_gray_close_testpat.pgm", dst);
   vc_image_free(src);
   vc_image_free(dst);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 double benchmark_function(int (*vc_function)(IVC *, IVC *)) {
   IVC *gray = vc_read_image("Images/Classic/barbara.pgm");
   IVC *rgb = vc_rgb_new(gray->width, gray->height);
   clock_t start = clock();
-  if ((*vc_function)(gray, rgb) != EXIT_SUCCESS)
+  if ((*vc_function)(gray, rgb) != 1)
     return -1.0;
   clock_t end = clock();
   vc_image_free(gray);
@@ -1367,10 +1367,10 @@ int vc_test_binary_function(char *filepath, imagetype_e type,
     dst = vc_binary_new(src->width, src->height);
     break;
   default:
-    return EXIT_FAILURE;
+    return 0;
   }
-  if ((*vc_fn)(src, dst) != EXIT_SUCCESS)
-    return EXIT_FAILURE;
+  if ((*vc_fn)(src, dst) != 1)
+    return 0;
   // TODO
   char buf[357]; // 255 + 1 + 100 + 1
   switch (type) {
@@ -1387,17 +1387,17 @@ int vc_test_binary_function(char *filepath, imagetype_e type,
     snprintf(buf, sizeof(buf), "%s/%s.pbm", OUTDIR, fn_name);
     break;
   default:
-    return EXIT_FAILURE;
+    return 0;
   }
   vc_write_image_info(buf, dst);
   vc_image_free(src);
   vc_image_free(dst);
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_binary_blob_print(OVC *blob) {
   if (!blob)
-    return EXIT_FAILURE;
+    return 0;
 
   printf("label: %d\n", blob->label);
   printf("mass center: (%d:%d)\n", blob->xc, blob->yc);
@@ -1406,7 +1406,7 @@ int vc_binary_blob_print(OVC *blob) {
   printf("width: %d\theight: %d\n", blob->width, blob->height);
   printf("x: %d\ty: %d\n", blob->x, blob->y);
 
-  return EXIT_SUCCESS;
+  return 1;
 }
 
 int vc_draw_boundary_box(IVC *src, int x_min, int x_max, int y_min, int y_max,
@@ -1748,4 +1748,30 @@ int vc_binary_blob_filter(OVC **blobs, int nblobs, int area) {
   *blobs = fblobs;
 
   return nfblobs;
+}
+
+// Get the H component of a HSV image
+int vc_hsv_get_hue(IVC *hsv, IVC *gray) {
+  if (!vc_is_rgb(hsv)) {
+    return 0;
+  }
+  if (!vc_is_grayscale(gray)) {
+    return 0;
+  }
+  if ((hsv->width != gray->width) || (hsv->height != gray->height)) {
+    return 0;
+  }
+
+  long pos_hsv, pos_gray;
+
+  for (int y = 0; y < hsv->height; y++) {
+    for (int x = 0; x < hsv->width; x++) {
+      pos_hsv = y * hsv->bytesperline + x * 3;
+      pos_gray = y * gray->bytesperline + x;
+
+      gray->data[pos_gray] = gray->data[pos_hsv];
+    }
+  }
+
+  return 1;
 }

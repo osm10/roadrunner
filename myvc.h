@@ -41,6 +41,8 @@ int vc_test_rgb_to_gray();
 int vc_rgb_to_hsv(IVC *rgb, IVC *hsv);
 int vc_test_rgb_to_hsv();
 
+int vc_hsv_get_hue(IVC *hsv, IVC *gray);
+
 int vc_scale_gray_to_rgb(IVC *gray, IVC *rgb);
 int vc_test_scale_gray_to_rgb();
 int vc_scale_gray_to_rgb2(IVC *gray, IVC *rgb);
