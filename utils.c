@@ -86,12 +86,13 @@ size_t get_images_from_dir(const char *path, char **images, size_t nimages) {
   char *filename, *filepath;
   size_t i = 0;
 
-  while ((dir = readdir(d)) != NULL) {
+  while (((dir = readdir(d)) != NULL) && (i < nimages)) {
     filename = dir->d_name;
     if (has_netpbm_file_extension(filename) == 1) {
-      // printf("VALID: %s\n", filename);
       filepath = concat(3, path, "/", filename);
-      // printf("filepath: %s\n", filepath);
+#ifdef DEBUG
+      printf("filepath: %s\n", filepath);
+#endif
       strncpy(images[i], filepath, strlen(filepath));
       free(filepath);
       i++;
