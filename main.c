@@ -6,6 +6,92 @@
 
 #define MAXIMAGES 50
 
+int vc_rgb_to_hsv_b(IVC *srcdst)
+{
+	unsigned char *data = (unsigned char *) srcdst->data;
+	int width = srcdst->width;
+	int height = srcdst->height;
+	int bytesperline = srcdst->bytesperline;
+	int channels = srcdst->channels;
+	float r, g, b, hue, saturation, value;
+	float rgb_max, rgb_min;
+	int i, size;
+
+	// Verifica��o de erros
+	if((srcdst->width <= 0) || (srcdst->height <= 0) || (srcdst->data == NULL)) return 0;
+	if(channels != 3) return 0;
+	
+	size = width * height * channels;
+	
+	for(i=0; i<size; i=i+channels)
+	{
+		r = (float) data[i];
+		g = (float) data[i + 1];
+		b = (float) data[i + 2];
+		
+		// Calcula valores máximo e mínimo dos canais de cor R, G e B
+		rgb_max = (r > g ? (r > b ? r : b) : (g > b ? g : b));
+		rgb_min = (r < g ? (r < b ? r : b) : (g < b ? g : b));
+		
+		// Value toma valores entre [0,255]
+		value = rgb_max;
+		if(value == 0.0)
+		{
+			hue = 0.0;
+			saturation = 0.0;
+		}
+		else
+		{
+			// Saturation toma valores entre [0,255]
+			saturation = ((rgb_max - rgb_min) / rgb_max) * (float) 255.0;
+
+			if(saturation == 0.0)
+			{
+				hue = 0.0;
+			}
+			else
+			{
+				// Hue toma valores entre [0,360]
+				if((rgb_max == r) && (g >= b))
+				{
+					hue = 60.0f * (g - b) / (rgb_max - rgb_min);
+				}
+				else if((rgb_max == r) && (b > g))
+				{
+					hue = 360.0f + 60.0f * (g - b) / (rgb_max - rgb_min);
+				}
+				else if(rgb_max == g)
+				{
+					hue = 120 + 60 * (b - r) / (rgb_max - rgb_min);
+				}
+				else  // rgb_max == b
+				{
+					hue = 240.0f + 60.0f * (r - g) / (rgb_max - rgb_min);
+				}
+			}
+		}
+		
+		// Atribui valores entre [0,255]
+		/*data[i] = (unsigned char) (hue / 360.0 * 255.0);
+		data[i + 1] = (unsigned char) (saturation);
+		data[i + 2] = (unsigned char) (value);*/
+
+		data[i]=0.0;
+		data[i+1] =0.0;
+		data[i+2]=0.0;
+		
+		//segmentar apenas os pixeis
+		//H:60 S:100 V:100
+		//H:43 S:100 V:90
+		// para encontar os bonecos amarelados
+		if((hue > 220) && (hue<=230) && (saturation/255.0*100.0 >=80) && (value/255.0*100.0 >=49))
+		{
+			data[i]=255; data[i+1]=255; data[i+2] =255;
+		}
+	}
+	return 1;
+}
+
 // Calcula a circularidade de um blob.
 float circularity(OVC *blob) {
   if (!blob)
@@ -16,6 +102,14 @@ float circularity(OVC *blob) {
 // Função auxiliar para comparar dois blobs por area.
 int compare_area(const void *a, const void *b) {
   return (((OVC *)b)->area - (((OVC *)a)->area));
+}
+
+int color_segmentation(IVC *src) {
+  vc_rgb_to_hsv_b(src);
+  if (!vc_write_image_info("out/blue.ppm", src)) {
+    error("process_file2: vc_write_image_info failed\n");
+  }
+  return 1;
 }
 
 int shape_segmentation(IVC *src) {
@@ -83,6 +177,7 @@ int process_file(const char *path) {
   //Color color = vc_find_color(src);
   // vc_color_print(color);
   //Shape shape = vc_find_shape(src);
+  color_segmentation(src);
   shape_segmentation(src);
   vc_image_free(src);
   return 1;
