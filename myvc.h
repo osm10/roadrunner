@@ -107,4 +107,11 @@ int vc_test_binary_function(char* filepath, imagetype_e type, int (*vc_fn)(IVC*,
 
 int vc_histogram_grayscale(IVC *src, long hist[]);
 
+// Filters
+int vc_gray_lowpass_mean_filter(IVC *src, IVC *dst);
+int vc_gray_lowpass_median_filter(IVC *src, IVC *dst);
+
+// Edge detection
+int vc_gray_edge_canny(IVC *src, IVC *dst);
+
 #endif /* MYVC */

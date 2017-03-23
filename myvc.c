@@ -1446,6 +1446,16 @@ int vc_draw_mass_center(IVC *src, int xc, int yc, int color) {
   return 1;
 }
 
+unsigned char minimum_non_zero(unsigned char *arr, size_t size) {
+  unsigned char min = 255;
+  for (size_t i = 0; i < size; i++) {
+    if ((arr[i] != 0) && (arr[i] != 255) && (arr[i] < min)) {
+      min = arr[i];
+    }
+  }
+  return min;
+}
+
 // Etiquetagem de blobs
 // src : Imagem binária
 // dst : Imagem grayscale (irá conter as etiquetas)
@@ -1464,12 +1474,13 @@ OVC *vc_binary_blob_labelling(IVC *src, IVC *dst, int *nlabels) {
   long int i, size;
   long int posX, posA, posB, posC, posD;
   int labeltable[256] = {0};
+  int labelarea[256] = {0};
   int label = 1; // Etiqueta inicial.
   int num;
-  OVC *blobs; // Apontador para lista de blobs (objectos) que será retornada
-              // desta funçãoo.
+  OVC *blobs; // Apontador para lista de blobs (objectos) que ser� retornada
+              // desta fun��o.
 
-  // Verificação de erros
+  // Verifica��o de erros
   if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
     return 0;
   if ((src->width != dst->width) || (src->height != dst->height) ||
@@ -1478,19 +1489,19 @@ OVC *vc_binary_blob_labelling(IVC *src, IVC *dst, int *nlabels) {
   if (channels != 1)
     return NULL;
 
-  // Copia dados da imagem binária para imagem grayscale
+  // Copia dados da imagem bin�ria para imagem grayscale
   memcpy(datadst, datasrc, bytesperline * height);
 
-  // Todos os pixeis de plano de fundo devem obrigatóriamente ter valor 0
-  // Todos os pixeis de primeiro plano devem obrigatóriamente ter valor 255
-  // Serão atribuídas etiquetas no intervalo [1,254]
-  // Este algoritmo está assim limitado a 254 labels
+  // Todos os pix�is de plano de fundo devem obrigat�riamente ter valor 0
+  // Todos os pix�is de primeiro plano devem obrigat�riamente ter valor 255
+  // Ser�o atribu�das etiquetas no intervalo [1,254]
+  // Este algoritmo est� assim limitado a 254 labels
   for (i = 0, size = bytesperline * height; i < size; i++) {
     if (datadst[i] != 0)
       datadst[i] = 255;
   }
 
-  // Limpa os rebordos da imagem binária
+  // Limpa os rebordos da imagem bin�ria
   for (y = 0; y < height; y++) {
     datadst[y * bytesperline + 0 * channels] = 0;
     datadst[y * bytesperline + (width - 1) * channels] = 0;
@@ -1507,11 +1518,11 @@ OVC *vc_binary_blob_labelling(IVC *src, IVC *dst, int *nlabels) {
       // A B C
       // D X
 
-      posA = (y - 1) * bytesperline + (x - 1) * channels;
-      posB = (y - 1) * bytesperline + x * channels;
-      posC = (y - 1) * bytesperline + (x + 1) * channels;
-      posD = y * bytesperline + (x - 1) * channels;
-      posX = y * bytesperline + x * channels;
+      posA = (y - 1) * bytesperline + (x - 1) * channels; // A
+      posB = (y - 1) * bytesperline + x * channels;       // B
+      posC = (y - 1) * bytesperline + (x + 1) * channels; // C
+      posD = y * bytesperline + (x - 1) * channels;       // D
+      posX = y * bytesperline + x * channels;             // X
 
       // Se o pixel foi marcado
       if (datadst[posX] != 0) {
@@ -1523,25 +1534,25 @@ OVC *vc_binary_blob_labelling(IVC *src, IVC *dst, int *nlabels) {
         } else {
           num = 255;
 
-          // Se A está marcado, já tem etiqueta (já não é 255), e é menor que a
+          // Se A est� marcado, j� tem etiqueta (j� n�o � 255), e � menor que a
           // etiqueta "num"
           if ((datadst[posA] != 0) && (datadst[posA] != 255) &&
               (datadst[posA] < num)) {
             num = datadst[posA];
           }
-          // Se B está marcado, já tem etiqueta (já não é 255), e é menor que a
+          // Se B est� marcado, j� tem etiqueta (j� n�o � 255), e � menor que a
           // etiqueta "num"
           if ((datadst[posB] != 0) && (datadst[posB] != 255) &&
               (datadst[posB] < num)) {
             num = datadst[posB];
           }
-          // Se C está marcado, já tem etiqueta (já não é 255), e é menor que a
+          // Se C est� marcado, j� tem etiqueta (j� n�o � 255), e � menor que a
           // etiqueta "num"
           if ((datadst[posC] != 0) && (datadst[posC] != 255) &&
               (datadst[posC] < num)) {
             num = datadst[posC];
           }
-          // Se D está marcado, já tem etiqueta (já não é 255), e é menor que a
+          // Se D est� marcado, j� tem etiqueta (j� n�o � 255), e � menor que a
           // etiqueta "num"
           if ((datadst[posD] != 0) && (datadst[posD] != 255) &&
               (datadst[posD] < num)) {
@@ -1605,7 +1616,7 @@ OVC *vc_binary_blob_labelling(IVC *src, IVC *dst, int *nlabels) {
     }
   }
 
-  // Contagem do número de blobs
+  // Contagem do n�mero de blobs
   // Passo 1: Eliminar, da tabela, etiquetas repetidas
   for (a = 1; a < label - 1; a++) {
     for (b = a + 1; b < label; b++) {
@@ -1623,7 +1634,7 @@ OVC *vc_binary_blob_labelling(IVC *src, IVC *dst, int *nlabels) {
     }
   }
 
-  // Se não há blobs
+  // Se n�o h� blobs
   if (*nlabels == 0)
     return NULL;
 
@@ -1632,9 +1643,8 @@ OVC *vc_binary_blob_labelling(IVC *src, IVC *dst, int *nlabels) {
   if (blobs != NULL) {
     for (a = 0; a < (*nlabels); a++)
       blobs[a].label = labeltable[a];
-  } else {
+  } else
     return NULL;
-  }
 
   return blobs;
 }
@@ -1766,12 +1776,146 @@ int vc_hsv_get_hue(IVC *hsv, IVC *gray) {
 
   for (int y = 0; y < hsv->height; y++) {
     for (int x = 0; x < hsv->width; x++) {
-      pos_hsv = y * hsv->bytesperline + x * 3;
-      pos_gray = y * gray->bytesperline + x;
+      pos_hsv = (y * hsv->bytesperline) + (x * 3);
+      pos_gray = (y * gray->bytesperline) + x;
 
       gray->data[pos_gray] = gray->data[pos_hsv];
     }
   }
+
+  return 1;
+}
+
+int vc_gray_lowpass_mean_filter(IVC *src, IVC *dst) {
+  unsigned char *datasrc = (unsigned char *)src->data;
+  unsigned char *datadst = (unsigned char *)dst->data;
+  int width = src->width;
+  int height = src->height;
+  int bytesperline = src->bytesperline;
+  int channels = src->channels;
+  int x, y;
+  long int posX, posA, posB, posC, posD, posE, posF, posG, posH;
+  float sum;
+
+  // Verificação de erros
+  if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
+    return 0;
+  if ((src->width != dst->width) || (src->height != dst->height) ||
+      (src->channels != dst->channels))
+    return 0;
+  if ((src->channels != 1))
+    return 0;
+
+  for (y = 1; y < height - 1; y++) {
+    for (x = 1; x < width - 1; x++) {
+      posA = (y - 1) * bytesperline + (x - 1) * channels;
+      posB = (y - 1) * bytesperline + (x)*channels;
+      posC = (y - 1) * bytesperline + (x + 1) * channels;
+      posD = y * bytesperline + (x - 1) * channels;
+      posX = y * bytesperline + (x)*channels;
+      posE = y * bytesperline + (x + 1) * channels;
+      posF = (y + 1) * bytesperline + (x - 1) * channels;
+      posG = (y + 1) * bytesperline + (x)*channels;
+      posH = (y + 1) * bytesperline + (x + 1) * channels;
+
+      sum = datasrc[posX];
+      sum += datasrc[posA];
+      sum += datasrc[posB];
+      sum += datasrc[posC];
+      sum += datasrc[posD];
+      sum += datasrc[posE];
+      sum += datasrc[posF];
+      sum += datasrc[posG];
+      sum += datasrc[posH];
+
+      datadst[posX] = (unsigned char)(sum / 9);
+    }
+  }
+
+  return 1;
+}
+
+int vc_gray_lowpass_median_filter(IVC *src, IVC *dst) {
+  unsigned char *datasrc = (unsigned char *)src->data;
+  unsigned char *datadst = (unsigned char *)dst->data;
+  int width = src->width;
+  int height = src->height;
+  int bytesperline = src->bytesperline;
+  int channels = src->channels;
+  int x, y;
+  int i, j;
+  long int posX, posA, posB, posC, posD, posE, posF, posG, posH;
+  unsigned char minvalue, minindex, tmp;
+  unsigned char values[9];
+
+  // Verificação de erros
+  if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
+    return 0;
+  if ((src->width != dst->width) || (src->height != dst->height) ||
+      (src->channels != dst->channels))
+    return 0;
+  if ((src->channels != 1))
+    return 0;
+
+  for (y = 1; y < height - 1; y++) {
+    for (x = 1; x < width - 1; x++) {
+      posA = (y - 1) * bytesperline + (x - 1) * channels;
+      posB = (y - 1) * bytesperline + (x)*channels;
+      posC = (y - 1) * bytesperline + (x + 1) * channels;
+      posD = y * bytesperline + (x - 1) * channels;
+      posX = y * bytesperline + (x)*channels;
+      posE = y * bytesperline + (x + 1) * channels;
+      posF = (y + 1) * bytesperline + (x - 1) * channels;
+      posG = (y + 1) * bytesperline + (x)*channels;
+      posH = (y + 1) * bytesperline + (x + 1) * channels;
+
+      values[0] = datasrc[posA];
+      values[1] = datasrc[posB];
+      values[2] = datasrc[posC];
+      values[3] = datasrc[posD];
+      values[4] = datasrc[posX];
+      values[5] = datasrc[posE];
+      values[6] = datasrc[posF];
+      values[7] = datasrc[posG];
+      values[8] = datasrc[posH];
+
+      // Organiza o array[] por ordem crescente
+      for (i = 0; i < 9 - 1; i++) {
+        minvalue = values[i];
+        minindex = i;
+
+        for (j = i + 1; j < 9; j++) {
+          if (minvalue > values[j]) {
+            minvalue = values[j];
+            minindex = j;
+          }
+        }
+
+        if (i != minindex) {
+          tmp = values[i];
+          values[i] = values[minindex];
+          values[minindex] = tmp;
+        }
+      }
+
+      // Coloca no pixel de saida, o valor da mediana (values[4])
+      datadst[posX] = (unsigned char)values[4];
+    }
+  }
+
+  return 1;
+}
+
+// TODO
+int vc_gray_edge_canny(IVC *src, IVC *dst) {
+  // Verificação de erros
+  if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
+    return 0;
+  if ((src->width != dst->width) || (src->height != dst->height) ||
+      (src->channels != dst->channels))
+    return 0;
+  if ((src->channels != 1))
+    return 0;
 
   return 1;
 }

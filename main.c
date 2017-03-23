@@ -4,13 +4,88 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAXIMAGES 10
+#define MAXIMAGES 50
+
+// Calcula a circularidade de um blob.
+float circularity(OVC *blob) {
+  if (!blob)
+    return -1.0f;
+  return (12.5663706 * blob->area) / (blob->perimeter * blob->perimeter);
+}
+
+// Função auxiliar para comparar dois blobs por area.
+int compare_area(const void *a, const void *b) {
+  return (((OVC *)b)->area - (((OVC *)a)->area));
+}
+
+int shape_segmentation(const char *path) {
+  IVC *src = vc_read_image((char *)path);
+  IVC *gray = vc_grayscale_new(src->width, src->height);
+  IVC *segm = vc_grayscale_new(src->width, src->height);
+  IVC *dst = vc_grayscale_new(src->width, src->height);
+
+  if (!vc_rgb_to_gray(src, gray))
+    return 0;
+  if (!vc_write_image_info("out/gray.pgm", gray)) {
+    error("process_file2: vc_write_image_info failed\n");
+  }
+
+  if (!vc_gray_to_binary_otsu(gray, segm))
+    return 0;
+  if (!vc_write_image_info("out/segm.pgm", segm)) {
+    error("process_file2: vc_write_image_info failed\n");
+  }
+
+  int nblobs = 0;
+  OVC *blobs = vc_binary_blob_labelling(segm, dst, &nblobs);
+  if (!blobs)
+    return 0;
+
+  vc_binary_blob_info(dst, blobs, nblobs);
+
+  printf("nblobs: %d\n", nblobs);
+
+  if (!vc_write_image_info("out/blobbed.pgm", dst)) {
+    error("process_file2: vc_write_image_info failed\n");
+  }
+
+  qsort(blobs, nblobs, sizeof(OVC),
+        compare_area); // filtrar por area decrescente
+
+  // saltamos o maior (i=1)
+  for (int i = 0; i < nblobs; i++) {
+    OVC *blob = &blobs[i];
+    vc_binary_blob_print(blob);
+    printf("Circularity: %.2f\n\n", circularity(blob));
+    if (!vc_draw_boundary_box(dst, blob->x, blob->x + blob->width, blob->y,
+                              blob->y + blob->height, 255))
+      return 0;
+    if (!vc_draw_mass_center(dst, blob->xc, blob->yc, 255))
+      return 0;
+  }
+
+  if (!vc_write_image_info("out/bounded.pgm", dst)) {
+    error("process_file2: vc_write_image_info failed\n");
+  }
+
+  // nblobs = vc_binary_blob_filter(&blobs, nblobs, 30);
+
+  vc_image_free(src);
+  vc_image_free(gray);
+  vc_image_free(segm);
+  vc_image_free(dst);
+  free(blobs);
+
+  return 1;
+}
 
 int process_file(const char *path) {
-  IVC *src = vc_read_image((char *)path);
-  Color color = vc_find_color(src);
-  Shape shape = vc_find_shape(src); // vc_indentify_shape(blob, 0.2f);
-  vc_image_free(src);
+  //IVC *src = vc_read_image((char *)path);
+  //Color color = vc_find_color(src);
+  // vc_color_print(color);
+  //Shape shape = vc_find_shape(src);
+  shape_segmentation(path);
+  //vc_image_free(src);
   return 1;
 }
 
@@ -36,11 +111,12 @@ void free_images(char *images[], size_t nimages) {
   }
   free(images);
 }
+
 int main(int argc, char *argv[]) {
   if (argc < 2) {
     fprintf(stderr, "Error: not enough arguments\n");
     usage(argv[0]);
-    return EXIT_FAILURE;
+    return 0;
   }
 
   // caminho do ficheiro ou pasta dado pelo utilizador
@@ -48,11 +124,12 @@ int main(int argc, char *argv[]) {
 
   // testamos se o argumento é um ficheiro
   if (is_regular_file(path)) {
+    printf("Processing: %s\n", path);
     if (!process_file(path)) {
       fprintf(stderr, "main: process_file failed\n");
-      return EXIT_FAILURE;
+      return 0;
     }
-    return EXIT_SUCCESS;
+    return 1;
   }
 
   // alocação de memória para MAXIMAGES com 100 caracteres cada
@@ -62,69 +139,23 @@ int main(int argc, char *argv[]) {
   // testamos se o argumento é um diretório
   if (is_directory(path)) {
     nimages = get_images_from_dir(path, images, MAXIMAGES);
-    printf("nimages: %ld\n", nimages);
+    printf("Number of images to process: %ld\n", nimages);
     if (nimages < 1) {
       fprintf(stderr, "main: get_images_from_dir found no images\n");
       free_images(images, MAXIMAGES);
-      return EXIT_FAILURE;
+      return 0;
     }
     for (size_t i = 0; i < nimages; i++) {
-      printf("image: %s\n", images[i]);
+      printf("Processing: %s\n", images[i]);
+      if (!process_file(images[i])) {
+      	fprintf(stderr, "main: process_file on image `%s'\n", path);
+      }
+      getchar();
     }
   }
 
   // libertar o espaço
   free_images(images, MAXIMAGES);
 
-  return EXIT_SUCCESS;
+  return 1;
 }
-
-/*
-int main(void) {
-  IVC *image[3];
-  int i, nblobs;
-  OVC *blobs;
-
-  image[0] = vc_read_image("samples/others/flir-01.pgm");
-  if (image[0] == NULL) {
-    printf("ERROR -> vc_read_image():\n\tFile not found!\n");
-    getchar();
-    return 0;
-  }
-
-  image[1] = vc_image_new(image[0]->width, image[0]->height, 1, 255);
-  image[2] = vc_image_new(image[0]->width, image[0]->height, 1, 255);
-  if (image[1] == NULL) {
-    printf("ERROR -> vc_image_new():\n\tOut of memory!\n");
-    getchar();
-    return 0;
-  }
-
-  vc_gray_to_binary_fixed(image[0], image[1], 127);
-  blobs = vc_binary_blob_labelling(image[1], image[2], &nblobs);
-
-  if (blobs != NULL) {
-    printf("\nNumber of labels (before filter): %d\n", nblobs);
-    vc_binary_blob_info(image[2], blobs, nblobs);
-    nblobs = vc_binary_blob_filter(&blobs, nblobs, 30);
-    printf("Number of labels (after filter): %d\n", nblobs);
-    for (i = 0; i < nblobs; i++) {
-      vc_binary_blob_print(&blobs[i]);
-      printf("\n");
-      vc_draw_mass_center(image[2], blobs[i].xc, blobs[i].yc, 255);
-      vc_draw_boundary_box(image[2], blobs[i].x, blobs[i].x + blobs[i].width,
-                           blobs[i].y, blobs[i].y + blobs[i].height, 255);
-    }
-
-    free(blobs);
-  }
-
-  vc_write_image("out/vc0022.pgm", image[2]);
-
-  vc_image_free(image[0]);
-  vc_image_free(image[1]);
-  vc_image_free(image[2]);
-
-  return 0;
-}
-*/
