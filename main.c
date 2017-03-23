@@ -6,87 +6,70 @@
 
 #define MAXIMAGES 50
 
-int vc_rgb_to_hsv_b(IVC *srcdst)
+#define MAX3(a,b,c) (a>b?(a>c?a:c):(b>c?b:c))
+#define MIN3(a,b,c) (a<b?(a<c?a:c):(b<c?b:c))
+
+int vc_rgb_to_hsv_b(IVC *src, IVC *dst)
 {
-	unsigned char *data = (unsigned char *) srcdst->data;
-	int width = srcdst->width;
-	int height = srcdst->height;
-	int bytesperline = srcdst->bytesperline;
-	int channels = srcdst->channels;
-	float r, g, b, hue, saturation, value;
-	float rgb_max, rgb_min;
-	int i, size;
+	unsigned char *data_src = (unsigned char *)src->data;
+	int width = src->width;
+	int height = src->height;
+	int bytesperline = src->width * src->channels;
+	int channels = src->channels;
+	unsigned char *data_dst = (unsigned char *)dst->data;
+	
+	int x, y;
+	int long pos;
+	float rf, gf, bf;
+	float hue, saturation, value;
+	float max, min;
 
-	// Verifica��o de erros
-	if((srcdst->width <= 0) || (srcdst->height <= 0) || (srcdst->data == NULL)) return 0;
-	if(channels != 3) return 0;
-	
-	size = width * height * channels;
-	
-	for(i=0; i<size; i=i+channels)
+
+	//verificação de erros
+	if( src->width <= 0 || src->height <= 0 || src->data == NULL) return 0;
+	if( dst->width != src->width || dst->height != src->height) return 0;
+	if(src->channels !=3 || dst->channels != 3) return 0;
+
+	for(x=0; x< width; x++)
 	{
-		r = (float) data[i];
-		g = (float) data[i + 1];
-		b = (float) data[i + 2];
-		
-		// Calcula valores máximo e mínimo dos canais de cor R, G e B
-		rgb_max = (r > g ? (r > b ? r : b) : (g > b ? g : b));
-		rgb_min = (r < g ? (r < b ? r : b) : (g < b ? g : b));
-		
-		// Value toma valores entre [0,255]
-		value = rgb_max;
-		if(value == 0.0)
+		for(y=0; y< height; y++)
 		{
-			hue = 0.0;
-			saturation = 0.0;
-		}
-		else
-		{
-			// Saturation toma valores entre [0,255]
-			saturation = ((rgb_max - rgb_min) / rgb_max) * (float) 255.0;
+			pos = y*bytesperline + x*channels;
+			
+			rf = (float)data_src[pos];
+			gf = (float)data_src[pos+1];
+			bf = (float)data_src[pos+2];
+			
+			max = MAX3(rf,gf,bf);
+			min = MIN3(rf,gf,bf);
 
-			if(saturation == 0.0)
-			{
-				hue = 0.0;
-			}
+			value = max;
+			if(value==0.0){ saturation=0.0; hue=0.0; }
 			else
-			{
-				// Hue toma valores entre [0,360]
-				if((rgb_max == r) && (g >= b))
+			{ 
+				saturation = ((value-min)/value)*255.0f;
+				if(saturation == 0.0) { hue=0.0; value=0.0;} 
+				else
 				{
-					hue = 60.0f * (g - b) / (rgb_max - rgb_min);
+					if((max==rf)&&(gf>=bf)) hue = 60.0f * (gf-bf)/(max-min);
+					else if((max==rf)&&(gf<bf)) hue = 360.0f + 60.0f * (gf-bf)/(max-min);
+					else if(max==gf) hue = 120.0f + 60.0f * (bf-rf)/(max-min);
+					else hue = 240.0f + 60.0f * (rf-rf)/(max-min); //max == b
 				}
-				else if((rgb_max == r) && (b > g))
-				{
-					hue = 360.0f + 60.0f * (g - b) / (rgb_max - rgb_min);
-				}
-				else if(rgb_max == g)
-				{
-					hue = 120 + 60 * (b - r) / (rgb_max - rgb_min);
-				}
-				else  // rgb_max == b
-				{
-					hue = 240.0f + 60.0f * (r - g) / (rgb_max - rgb_min);
-				}
+				
 			}
-		}
-		
-		// Atribui valores entre [0,255]
-		/*data[i] = (unsigned char) (hue / 360.0 * 255.0);
-		data[i + 1] = (unsigned char) (saturation);
-		data[i + 2] = (unsigned char) (value);*/
+							
+			data_dst[pos]=0;	//(unsigned char)(hue / 360.0f * 255.0f);
+			data_dst[pos+1]=0;	//(unsigned char)saturation;
+			data_dst[pos+2]=0;	//(unsigned char)value;
 
-		data[i]=0.0;
-		data[i+1] =0.0;
-		data[i+2]=0.0;
-		
-		//segmentar apenas os pixeis
-		//H:60 S:100 V:100
-		//H:43 S:100 V:90
-		// para encontar os bonecos amarelados
-		if((hue > 220) && (hue<=230) && (saturation/255.0*100.0 >=80) && (value/255.0*100.0 >=49))
-		{
-			data[i]=255; data[i+1]=255; data[i+2] =255;
+			//segmentar apenas os pixeis			
+			//H:226 S:82 V:51
+			// para encontar os sinais azuis
+			if((hue >= 220) && (hue < 230) && (saturation*100/255 >=80) && (value*100/255 >=50))
+			{
+				data_dst[pos]=255; data_dst[pos+1]=255; data_dst[pos+2] =255;
+			}
 		}
 	}
 	return 1;
