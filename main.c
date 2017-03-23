@@ -74,7 +74,136 @@ int vc_rgb_to_hsv_b(IVC *src, IVC *dst)
 	}
 	return 1;
 }
+int vc_rgb_to_hsv_r(IVC *src, IVC *dst)
+{
+	unsigned char *data_src = (unsigned char *)src->data;
+	int width = src->width;
+	int height = src->height;
+	int bytesperline = src->width * src->channels;
+	int channels = src->channels;
+	unsigned char *data_dst = (unsigned char *)dst->data;
+	
+	int x, y;
+	int long pos;
+	float rf, gf, bf;
+	float hue, saturation, value;
+	float max, min;
 
+
+	//verificação de erros
+	if( src->width <= 0 || src->height <= 0 || src->data == NULL) return 0;
+	if( dst->width != src->width || dst->height != src->height) return 0;
+	if(src->channels !=3 || dst->channels != 3) return 0;
+
+	for(x=0; x< width; x++)
+	{
+		for(y=0; y< height; y++)
+		{
+			pos = y*bytesperline + x*channels;
+			
+			rf = (float)data_src[pos];
+			gf = (float)data_src[pos+1];
+			bf = (float)data_src[pos+2];
+			
+			max = MAX3(rf,gf,bf);
+			min = MIN3(rf,gf,bf);
+
+			value = max;
+			if(value==0.0){ saturation=0.0; hue=0.0; }
+			else
+			{ 
+				saturation = ((value-min)/value)*255.0f;
+				if(saturation == 0.0) { hue=0.0; value=0.0;} 
+				else
+				{
+					if((max==rf)&&(gf>=bf)) hue = 60.0f * (gf-bf)/(max-min);
+					else if((max==rf)&&(gf<bf)) hue = 360.0f + 60.0f * (gf-bf)/(max-min);
+					else if(max==gf) hue = 120.0f + 60.0f * (bf-rf)/(max-min);
+					else hue = 240.0f + 60.0f * (rf-rf)/(max-min); //max == b
+				}
+				
+			}
+							
+			data_dst[pos]=0;	//(unsigned char)(hue / 360.0f * 255.0f);
+			data_dst[pos+1]=0;	//(unsigned char)saturation;
+			data_dst[pos+2]=0;	//(unsigned char)value;
+
+			//segmentar apenas os pixeis			
+			//H:0 S:90 V:80
+			// para encontar os sinais vermelhos
+			if((hue >= 0) && (hue < 10) && (saturation*100/255 >=90) && (value*100/255 >=80))
+			{
+				data_dst[pos]=255; data_dst[pos+1]=255; data_dst[pos+2] =255;
+			}
+		}
+	}
+	return 1;
+}
+int vc_rgb_to_hsv_y(IVC *src, IVC *dst)
+{
+	unsigned char *data_src = (unsigned char *)src->data;
+	int width = src->width;
+	int height = src->height;
+	int bytesperline = src->width * src->channels;
+	int channels = src->channels;
+	unsigned char *data_dst = (unsigned char *)dst->data;
+	
+	int x, y;
+	int long pos;
+	float rf, gf, bf;
+	float hue, saturation, value;
+	float max, min;
+
+
+	//verificação de erros
+	if( src->width <= 0 || src->height <= 0 || src->data == NULL) return 0;
+	if( dst->width != src->width || dst->height != src->height) return 0;
+	if(src->channels !=3 || dst->channels != 3) return 0;
+
+	for(x=0; x< width; x++)
+	{
+		for(y=0; y< height; y++)
+		{
+			pos = y*bytesperline + x*channels;
+			
+			rf = (float)data_src[pos];
+			gf = (float)data_src[pos+1];
+			bf = (float)data_src[pos+2];
+			
+			max = MAX3(rf,gf,bf);
+			min = MIN3(rf,gf,bf);
+
+			value = max;
+			if(value==0.0){ saturation=0.0; hue=0.0; }
+			else
+			{ 
+				saturation = ((value-min)/value)*255.0f;
+				if(saturation == 0.0) { hue=0.0; value=0.0;} 
+				else
+				{
+					if((max==rf)&&(gf>=bf)) hue = 60.0f * (gf-bf)/(max-min);
+					else if((max==rf)&&(gf<bf)) hue = 360.0f + 60.0f * (gf-bf)/(max-min);
+					else if(max==gf) hue = 120.0f + 60.0f * (bf-rf)/(max-min);
+					else hue = 240.0f + 60.0f * (rf-rf)/(max-min); //max == b
+				}
+				
+			}
+							
+			data_dst[pos]=0;	//(unsigned char)(hue / 360.0f * 255.0f);
+			data_dst[pos+1]=0;	//(unsigned char)saturation;
+			data_dst[pos+2]=0;	//(unsigned char)value;
+
+			//segmentar apenas os pixeis			
+			//H:55 S:100 V:100
+			// para encontar os sinais amarelos
+			if((hue >= 50) && (hue < 60) && (saturation*100/255 >=90) && (value*100/255 >=90))
+			{
+				data_dst[pos]=255; data_dst[pos+1]=255; data_dst[pos+2] =255;
+			}
+		}
+	}
+	return 1;
+}
 // Calcula a circularidade de um blob.
 float circularity(OVC *blob) {
   if (!blob)
@@ -88,8 +217,9 @@ int compare_area(const void *a, const void *b) {
 }
 
 int color_segmentation(IVC *src) {
-  vc_rgb_to_hsv_b(src);
-  if (!vc_write_image_info("out/blue.ppm", src)) {
+  IVC *dst = vc_grayscale_new(src->width, src->height);
+  vc_rgb_to_hsv_b(src,dst);
+  if (!vc_write_image_info("out/blue.ppm", dst)) {
     error("process_file2: vc_write_image_info failed\n");
   }
   return 1;
