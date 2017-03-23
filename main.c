@@ -18,8 +18,7 @@ int compare_area(const void *a, const void *b) {
   return (((OVC *)b)->area - (((OVC *)a)->area));
 }
 
-int shape_segmentation(const char *path) {
-  IVC *src = vc_read_image((char *)path);
+int shape_segmentation(IVC *src) {
   IVC *gray = vc_grayscale_new(src->width, src->height);
   IVC *segm = vc_grayscale_new(src->width, src->height);
   IVC *dst = vc_grayscale_new(src->width, src->height);
@@ -80,12 +79,12 @@ int shape_segmentation(const char *path) {
 }
 
 int process_file(const char *path) {
-  //IVC *src = vc_read_image((char *)path);
+  IVC *src = vc_read_image((char *)path);
   //Color color = vc_find_color(src);
   // vc_color_print(color);
   //Shape shape = vc_find_shape(src);
-  shape_segmentation(path);
-  //vc_image_free(src);
+  shape_segmentation(src);
+  vc_image_free(src);
   return 1;
 }
 
