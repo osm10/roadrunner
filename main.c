@@ -48,13 +48,13 @@ int vc_rgb_to_hsv_b(IVC *src, IVC *dst)
 			else
 			{ 
 				saturation = ((value-min)/value)*255.0f;
-				if(saturation == 0.0) { hue=0.0; value=0.0;} 
+				if(saturation == 0.0) { hue=0.0; } 
 				else
 				{
 					if((max==rf)&&(gf>=bf)) hue = 60.0f * (gf-bf)/(max-min);
 					else if((max==rf)&&(gf<bf)) hue = 360.0f + 60.0f * (gf-bf)/(max-min);
 					else if(max==gf) hue = 120.0f + 60.0f * (bf-rf)/(max-min);
-					else hue = 240.0f + 60.0f * (rf-rf)/(max-min); //max == b
+					else hue = 240.0f + 60.0f * (rf-gf)/(max-min); //max == b
 				}
 				
 			}
@@ -66,7 +66,7 @@ int vc_rgb_to_hsv_b(IVC *src, IVC *dst)
 			//segmentar apenas os pixeis			
 			//H:226 S:82 V:51
 			// para encontar os sinais azuis
-			if((hue >= 220) && (hue < 230) && (saturation*100/255 >=70) && (value*100/255 >=40))
+			if((hue >= 220 && hue < 230) && (saturation*100/255 >=70) && (value*100/255 >=40))
 			{
 				data_dst[pos]=255; data_dst[pos+1]=255; data_dst[pos+2] =255;
 			}
@@ -113,13 +113,13 @@ int vc_rgb_to_hsv_r(IVC *src, IVC *dst)
 			else
 			{ 
 				saturation = ((value-min)/value)*255.0f;
-				if(saturation == 0.0) { hue=0.0; value=0.0;} 
+				if(saturation == 0.0) { hue=0.0; } 
 				else
 				{
 					if((max==rf)&&(gf>=bf)) hue = 60.0f * (gf-bf)/(max-min);
 					else if((max==rf)&&(gf<bf)) hue = 360.0f + 60.0f * (gf-bf)/(max-min);
 					else if(max==gf) hue = 120.0f + 60.0f * (bf-rf)/(max-min);
-					else hue = 240.0f + 60.0f * (rf-rf)/(max-min); //max == b
+					else hue = 240.0f + 60.0f * (rf-gf)/(max-min); //max == b
 				}
 				
 			}
@@ -131,7 +131,7 @@ int vc_rgb_to_hsv_r(IVC *src, IVC *dst)
 			//segmentar apenas os pixeis			
 			//H:0 S:90 V:80
 			// para encontar os sinais vermelhos
-			if((hue >= 0) && (hue < 10) && (saturation*100/255 >=90) && (value*100/255 >=80))
+			if((hue >= 0 && hue < 10) && (saturation*100/255 >=90) && (value*100/255 >=80))
 			{
 				data_dst[pos]=255; data_dst[pos+1]=255; data_dst[pos+2] =255;
 			}
@@ -178,13 +178,13 @@ int vc_rgb_to_hsv_y(IVC *src, IVC *dst)
 			else
 			{ 
 				saturation = ((value-min)/value)*255.0f;
-				if(saturation == 0.0) { hue=0.0; value=0.0;} 
+				if(saturation == 0.0) { hue=0.0; } 
 				else
 				{
 					if((max==rf)&&(gf>=bf)) hue = 60.0f * (gf-bf)/(max-min);
 					else if((max==rf)&&(gf<bf)) hue = 360.0f + 60.0f * (gf-bf)/(max-min);
 					else if(max==gf) hue = 120.0f + 60.0f * (bf-rf)/(max-min);
-					else hue = 240.0f + 60.0f * (rf-rf)/(max-min); //max == b
+					else hue = 240.0f + 60.0f * (rf-gf)/(max-min); //max == b
 				}
 				
 			}
@@ -196,7 +196,7 @@ int vc_rgb_to_hsv_y(IVC *src, IVC *dst)
 			//segmentar apenas os pixeis			
 			//H:55 S:100 V:100
 			// para encontar os sinais amarelos
-			if((hue >= 50) && (hue < 60) && (saturation*100/255 >=90) && (value*100/255 >=90))
+			if((hue >= 50 && hue < 60) && (saturation*100/255 >=90) && (value*100/255 >=90))
 			{
 				data_dst[pos]=255; data_dst[pos+1]=255; data_dst[pos+2] =255;
 			}
@@ -218,8 +218,9 @@ int compare_area(const void *a, const void *b) {
 
 int color_segmentation(IVC *src) {
   IVC *dst = vc_image_new(src->width, src->height,src->channels,src->levels);
-  vc_rgb_to_hsv_r(src,dst);
-  if (!vc_write_image_info("out/red.ppm", dst)) {
+  //vc_rgb_to_hsv_r(src,dst);
+	vc_rgb_to_hsv_b(src,dst);
+  if (!vc_write_image_info("out/bue.ppm", dst)) {
     error("process_file2: vc_write_image_info failed\n");
   }
   return 1;
