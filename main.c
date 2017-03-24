@@ -131,7 +131,7 @@ int vc_rgb_to_hsv_r(IVC *src, IVC *dst)
 			//segmentar apenas os pixeis			
 			//H:0 S:90 V:80
 			// para encontar os sinais vermelhos
-			if((hue >= 0 && hue < 10) && (saturation*100/255 >=90) && (value*100/255 >=80))
+			if((hue >= 350 || hue < 10) && (saturation*100/255 >=60) && (value*100/255 >=50))
 			{
 				data_dst[pos]=255; data_dst[pos+1]=255; data_dst[pos+2] =255;
 			}
@@ -218,9 +218,9 @@ int compare_area(const void *a, const void *b) {
 
 int color_segmentation(IVC *src) {
   IVC *dst = vc_image_new(src->width, src->height,src->channels,src->levels);
-  //vc_rgb_to_hsv_r(src,dst);
-	vc_rgb_to_hsv_b(src,dst);
-  if (!vc_write_image_info("out/bue.ppm", dst)) {
+  vc_rgb_to_hsv_r(src,dst);
+	//vc_rgb_to_hsv_b(src,dst);
+  if (!vc_write_image_info("out/red.ppm", dst)) {
     error("process_file2: vc_write_image_info failed\n");
   }
   return 1;
