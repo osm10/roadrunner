@@ -6,6 +6,204 @@
 
 #define MAXIMAGES 50
 
+#define MAX3(a,b,c) (a>b?(a>c?a:c):(b>c?b:c))
+#define MIN3(a,b,c) (a<b?(a<c?a:c):(b<c?b:c))
+
+int vc_rgb_to_hsv_b(IVC *src, IVC *dst)
+{
+	unsigned char *data_src = (unsigned char *)src->data;
+	int width = src->width;
+	int height = src->height;
+	int bytesperline = src->width * src->channels;
+	int channels = src->channels;
+	unsigned char *data_dst = (unsigned char *)dst->data;
+	
+	int x, y;
+	int long pos;
+	float rf, gf, bf;
+	float hue, saturation, value;
+	float max, min;
+
+
+	//verificação de erros
+	if( src->width <= 0 || src->height <= 0 || src->data == NULL) return 0;
+	if( dst->width != src->width || dst->height != src->height) return 0;
+	if(src->channels !=3 || dst->channels != 3) return 0;
+
+	for(x=0; x< width; x++)
+	{
+		for(y=0; y< height; y++)
+		{
+			pos = y*bytesperline + x*channels;
+			
+			rf = (float)data_src[pos];
+			gf = (float)data_src[pos+1];
+			bf = (float)data_src[pos+2];
+			
+			max = MAX3(rf,gf,bf);
+			min = MIN3(rf,gf,bf);
+
+			value = max;
+			if(value==0.0){ saturation=0.0; hue=0.0; }
+			else
+			{ 
+				saturation = ((value-min)/value)*255.0f;
+				if(saturation == 0.0) { hue=0.0; } 
+				else
+				{
+					if((max==rf)&&(gf>=bf)) hue = 60.0f * (gf-bf)/(max-min);
+					else if((max==rf)&&(gf<bf)) hue = 360.0f + 60.0f * (gf-bf)/(max-min);
+					else if(max==gf) hue = 120.0f + 60.0f * (bf-rf)/(max-min);
+					else hue = 240.0f + 60.0f * (rf-gf)/(max-min); //max == b
+				}
+				
+			}
+							
+			data_dst[pos]=0;	//(unsigned char)(hue / 360.0f * 255.0f);
+			data_dst[pos+1]=0;	//(unsigned char)saturation;
+			data_dst[pos+2]=0;	//(unsigned char)value;
+
+			//segmentar apenas os pixeis			
+			//H:226 S:82 V:51
+			// para encontar os sinais azuis
+			if((hue >= 220 && hue < 230) && (saturation*100/255 >=70) && (value*100/255 >=40))
+			{
+				data_dst[pos]=255; data_dst[pos+1]=255; data_dst[pos+2] =255;
+			}
+		}
+	}
+	return 1;
+}
+int vc_rgb_to_hsv_r(IVC *src, IVC *dst)
+{
+	unsigned char *data_src = (unsigned char *)src->data;
+	int width = src->width;
+	int height = src->height;
+	int bytesperline = src->width * src->channels;
+	int channels = src->channels;
+	unsigned char *data_dst = (unsigned char *)dst->data;
+	
+	int x, y;
+	int long pos;
+	float rf, gf, bf;
+	float hue, saturation, value;
+	float max, min;
+
+
+	//verificação de erros
+	if( src->width <= 0 || src->height <= 0 || src->data == NULL) return 0;
+	if( dst->width != src->width || dst->height != src->height) return 0;
+	if(src->channels !=3 || dst->channels != 3) return 0;
+
+	for(x=0; x< width; x++)
+	{
+		for(y=0; y< height; y++)
+		{
+			pos = y*bytesperline + x*channels;
+			
+			rf = (float)data_src[pos];
+			gf = (float)data_src[pos+1];
+			bf = (float)data_src[pos+2];
+			
+			max = MAX3(rf,gf,bf);
+			min = MIN3(rf,gf,bf);
+
+			value = max;
+			if(value==0.0){ saturation=0.0; hue=0.0; }
+			else
+			{ 
+				saturation = ((value-min)/value)*255.0f;
+				if(saturation == 0.0) { hue=0.0; } 
+				else
+				{
+					if((max==rf)&&(gf>=bf)) hue = 60.0f * (gf-bf)/(max-min);
+					else if((max==rf)&&(gf<bf)) hue = 360.0f + 60.0f * (gf-bf)/(max-min);
+					else if(max==gf) hue = 120.0f + 60.0f * (bf-rf)/(max-min);
+					else hue = 240.0f + 60.0f * (rf-gf)/(max-min); //max == b
+				}
+				
+			}
+							
+			data_dst[pos]=0;	//(unsigned char)(hue / 360.0f * 255.0f);
+			data_dst[pos+1]=0;	//(unsigned char)saturation;
+			data_dst[pos+2]=0;	//(unsigned char)value;
+
+			//segmentar apenas os pixeis			
+			//H:0 S:90 V:80
+			// para encontar os sinais vermelhos
+			if((hue >= 350 || hue < 10) && (saturation*100/255 >=60) && (value*100/255 >=50))
+			{
+				data_dst[pos]=255; data_dst[pos+1]=255; data_dst[pos+2] =255;
+			}
+		}
+	}
+	return 1;
+}
+int vc_rgb_to_hsv_y(IVC *src, IVC *dst)
+{
+	unsigned char *data_src = (unsigned char *)src->data;
+	int width = src->width;
+	int height = src->height;
+	int bytesperline = src->width * src->channels;
+	int channels = src->channels;
+	unsigned char *data_dst = (unsigned char *)dst->data;
+	
+	int x, y;
+	int long pos;
+	float rf, gf, bf;
+	float hue, saturation, value;
+	float max, min;
+
+
+	//verificação de erros
+	if( src->width <= 0 || src->height <= 0 || src->data == NULL) return 0;
+	if( dst->width != src->width || dst->height != src->height) return 0;
+	if(src->channels !=3 || dst->channels != 3) return 0;
+
+	for(x=0; x< width; x++)
+	{
+		for(y=0; y< height; y++)
+		{
+			pos = y*bytesperline + x*channels;
+			
+			rf = (float)data_src[pos];
+			gf = (float)data_src[pos+1];
+			bf = (float)data_src[pos+2];
+			
+			max = MAX3(rf,gf,bf);
+			min = MIN3(rf,gf,bf);
+
+			value = max;
+			if(value==0.0){ saturation=0.0; hue=0.0; }
+			else
+			{ 
+				saturation = ((value-min)/value)*255.0f;
+				if(saturation == 0.0) { hue=0.0; } 
+				else
+				{
+					if((max==rf)&&(gf>=bf)) hue = 60.0f * (gf-bf)/(max-min);
+					else if((max==rf)&&(gf<bf)) hue = 360.0f + 60.0f * (gf-bf)/(max-min);
+					else if(max==gf) hue = 120.0f + 60.0f * (bf-rf)/(max-min);
+					else hue = 240.0f + 60.0f * (rf-gf)/(max-min); //max == b
+				}
+				
+			}
+							
+			data_dst[pos]=0;	//(unsigned char)(hue / 360.0f * 255.0f);
+			data_dst[pos+1]=0;	//(unsigned char)saturation;
+			data_dst[pos+2]=0;	//(unsigned char)value;
+
+			//segmentar apenas os pixeis			
+			//H:55 S:100 V:100
+			// para encontar os sinais amarelos
+			if((hue >= 50 && hue < 60) && (saturation*100/255 >=90) && (value*100/255 >=90))
+			{
+				data_dst[pos]=255; data_dst[pos+1]=255; data_dst[pos+2] =255;
+			}
+		}
+	}
+	return 1;
+}
 // Calcula a circularidade de um blob.
 float circularity(OVC *blob) {
   if (!blob)
@@ -16,6 +214,16 @@ float circularity(OVC *blob) {
 // Função auxiliar para comparar dois blobs por area.
 int compare_area(const void *a, const void *b) {
   return (((OVC *)b)->area - (((OVC *)a)->area));
+}
+
+int color_segmentation(IVC *src) {
+  IVC *dst = vc_image_new(src->width, src->height,src->channels,src->levels);
+  vc_rgb_to_hsv_r(src,dst);
+	//vc_rgb_to_hsv_b(src,dst);
+  if (!vc_write_image_info("out/red.ppm", dst)) {
+    error("process_file2: vc_write_image_info failed\n");
+  }
+  return 1;
 }
 
 int shape_segmentation(IVC *src) {
@@ -83,6 +291,7 @@ int process_file(const char *path) {
   //Color color = vc_find_color(src);
   // vc_color_print(color);
   //Shape shape = vc_find_shape(src);
+  color_segmentation(src);
   shape_segmentation(src);
   vc_image_free(src);
   return 1;
