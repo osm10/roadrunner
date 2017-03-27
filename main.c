@@ -96,13 +96,6 @@ int vc_rgb_to_hsv_y(IVC *src, IVC *dst) {
   return vc_rgb_to_hsv_by_color(src, dst, 50, 60, 90, 100, 90, 360);
 }
 
-// Calcula a circularidade de um blob.
-float circularity(OVC *blob) {
-  if (!blob)
-    return -1.0f;
-  return (12.5663706 * blob->area) / (blob->perimeter * blob->perimeter);
-}
-
 // Função auxiliar para comparar dois blobs por area.
 int compare_area(const void *a, const void *b) {
   return (((OVC *)b)->area - (((OVC *)a)->area));
@@ -155,7 +148,7 @@ int shape_segmentation(IVC *src) {
   for (int i = 0; i < nblobs; i++) {
     OVC *blob = &blobs[i];
     vc_binary_blob_print(blob);
-    printf("Circularity: %.2f\n\n", circularity(blob));
+    printf("Circularity: %.2f\n\n", blob->circularity);
     if (!vc_draw_boundary_box(dst, blob->x, blob->x + blob->width, blob->y,
                               blob->y + blob->height, 255))
       return 0;

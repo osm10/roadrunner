@@ -21,6 +21,7 @@ typedef struct {
   int xc, yc;// Centro-de-massa
   int perimeter;// Perimetro
   int label;// Etiqueta
+  float circularity; // Circularidade
 } OVC;
 
 int vc_gray_negative(IVC *image);

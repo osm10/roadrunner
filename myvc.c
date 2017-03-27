@@ -1721,6 +1721,9 @@ int vc_binary_blob_info(IVC *src, OVC *blobs, int nblobs) {
     // Centro de Gravidade
     blobs[i].xc = sumx / (blobs[i].area > 1 ? blobs[i].area : 1);
     blobs[i].yc = sumy / (blobs[i].area > 1 ? blobs[i].area : 1);
+
+    // Circularidade
+    blobs[i].circularity = (12.5663706 * blobs[i].width * blobs[i].height) / (blobs[i].perimeter * blobs[i].perimeter);
   }
 
   return 1;
