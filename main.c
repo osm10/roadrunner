@@ -1,25 +1,16 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "color.h"
 #include "myvc.h"
 #include "sign.h"
 #include "utils.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 #define MAXIMAGES 50
 
 // Função auxiliar para comparar dois blobs por area.
 int compare_area(const void *a, const void *b) {
   return (((OVC *)b)->area - (((OVC *)a)->area));
-}
-
-int color_segmentation(IVC *src) {
-  IVC *dst = vc_image_new(src->width, src->height, src->channels, src->levels);
-  // sinais vermelhos
-  vc_rgb_to_hsv_red(src, dst);
-  if (!vc_write_image_info("out/red.ppm", dst)) {
-    error("color_segmentation: vc_write_image_info failed\n");
-  }
-  return 1;
 }
 
 int shape_segmentation(IVC *src) {
@@ -84,12 +75,19 @@ int shape_segmentation(IVC *src) {
 
 int process_file(const char *path) {
   IVC *src = vc_read_image((char *)path);
-  // Color color = vc_find_color(src);
-  // vc_color_print(color);
+  IVC *dst = vc_rgb_new(src->width, src->height);
+
+  Color color = vc_find_color(src, dst);
+#ifdef DEBUG
+  vc_color_print(color);
+  vc_write_image_info("out/color_segm.ppm", dst);
+#endif
+
   // Shape shape = vc_find_shape(src);
-  color_segmentation(src);
-  shape_segmentation(src);
+
   vc_image_free(src);
+  vc_image_free(dst);
+
   return 1;
 }
 

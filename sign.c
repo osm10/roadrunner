@@ -1,6 +1,7 @@
 #include "sign.h"
-#include "stdlib.h"
 #include "utils.h"
+#include <stdlib.h>
+#include <string.h>
 
 // Sinais de transito conhecidos.
 Sign known_signs[7] = {
@@ -11,41 +12,66 @@ Sign known_signs[7] = {
 };
 
 // Determina a cor dominante de uma dada imagem RGB.
-Color vc_find_color(IVC *src) {
-  if (!src)
-    fatal("vc_find_color: src == null\n");
-  if (!vc_is_rgb(src))
-    fatal("vc_find_color: vc_is_rgb(src) failed\n");
+// - dst: imagem de saída segmentada para a cor dominante
+Color vc_find_color(IVC *src, IVC *dst) {
+  Color color = UnknownColor;
+  // Imagens temporárias
+  IVC *red = vc_rgb_new(src->width, src->height);
+  IVC *blue = vc_rgb_new(src->width, src->height);
+  IVC *yellow = vc_rgb_new(src->width, src->height);
+  size_t size = src->bytesperline * src->height;
 
-  IVC *hsv = vc_rgb_new(src->width, src->height);
-  if (!hsv) {
-    fatal("vc_find_color: allocation of new RGB image failed\n");
-  }
-
-  // converter a imagem de entrada para HSV
-  if (!vc_rgb_to_hsv(src, hsv)) {
-    fatal("vc_find_color: vc_rgb_to_hsv failed!\n");
-  }
-
+  // sinais vermelhos
+  long nred = vc_rgb_to_hsv_red(src, red);
 #ifdef DEBUG
-  vc_write_image_info("out/hsv.ppm", hsv);
+  if (!vc_write_image_info("out/red.ppm", red)) {
+    error("color_segmentation: vc_write_image_info failed\n");
+  }
+#endif
+  // sinais azuis
+  long nblue = vc_rgb_to_hsv_blue(src, blue);
+#ifdef DEBUG
+  if (!vc_write_image_info("out/blue.ppm", blue)) {
+    error("color_segmentation: vc_write_image_info failed\n");
+  }
+#endif
+  // sinais amarelos
+  long nyellow = vc_rgb_to_hsv_yellow(src, yellow);
+#ifdef DEBUG
+  if (!vc_write_image_info("out/yellow.ppm", yellow)) {
+    error("color_segmentation: vc_write_image_info failed\n");
+  }
 #endif
 
-  // calcular o histograma do canal H
-  long pos, hue_hist[256] = {0};
-  for (int x = 0; x < hsv->width; x++) {
-    for (int y = 0; y < hsv->height; y++) {
-      pos = y * hsv->bytesperline + x * hsv->channels;
-      hue_hist[hsv->data[pos]]++;
+#ifdef DEBUG
+  printf("Quantidade de pixeis\nVermelho: %ld\tAzul: %ld\tAmarelo: %ld\n", nred,
+         nblue, nyellow);
+#endif
+
+  if (nred > nblue) {
+    if (nred > nyellow) {
+      color = Red;
+      memcpy(dst->data, red->data, size);
+    } else {
+      color = Yellow;
+      memcpy(dst->data, yellow->data, size);
+    }
+  } else {
+    if (nblue > nyellow) {
+      color = Blue;
+      memcpy(dst->data, blue->data, size);
+    } else {
+      color = Yellow;
+      memcpy(dst->data, yellow->data, size);
     }
   }
 
-  // identificar a cor dominante no histograma
-  for (int x = 0; x < 256; x++) {
-    // TODO:
-  }
+  // Apagar imagens temporárias
+  vc_image_free(blue);
+  vc_image_free(red);
+  vc_image_free(yellow);
 
-  return UnknownColor;
+  return color;
 }
 
 // Determina a forma do sinal.
