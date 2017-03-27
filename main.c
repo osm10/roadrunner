@@ -1,3 +1,4 @@
+#include "color.h"
 #include "myvc.h"
 #include "sign.h"
 #include "utils.h"
@@ -5,96 +6,6 @@
 #include <stdlib.h>
 
 #define MAXIMAGES 50
-
-#define MAX3(a, b, c) (a > b ? (a > c ? a : c) : (b > c ? b : c))
-#define MIN3(a, b, c) (a < b ? (a < c ? a : c) : (b < c ? b : c))
-
-// hue:0-360; saturation:0-100: value:0-360
-int vc_rgb_to_hsv_by_color(IVC *src, IVC *dst, int hmin, int hmax, int smin,
-                           int smax, int vmin, int vmax) {
-  int x, y;
-  long pos;
-  float rf, gf, bf;
-  float hue, saturation, value;
-  float max, min;
-
-  // verificação de erros
-  if (src->width <= 0 || src->height <= 0 || src->data == NULL)
-    return 0;
-  if (dst->width != src->width || dst->height != src->height)
-    return 0;
-  if (src->channels != 3 || dst->channels != 3)
-    return 0;
-
-  for (x = 0; x < src->width; x++) {
-    for (y = 0; y < src->height; y++) {
-      pos = y * src->bytesperline + x * src->channels;
-
-      rf = (float)src->data[pos];
-      gf = (float)src->data[pos + 1];
-      bf = (float)src->data[pos + 2];
-
-      max = MAX3(rf, gf, bf);
-      min = MIN3(rf, gf, bf);
-
-      value = max;
-      if (value == 0.0) {
-        saturation = 0.0;
-        hue = 0.0;
-      } else {
-        saturation = ((value - min) / value) * 255.0f;
-        if (saturation == 0.0) {
-          hue = 0.0;
-        } else {
-          if ((max == rf) && (gf >= bf))
-            hue = 60.0f * (gf - bf) / (max - min);
-          else if ((max == rf) && (gf < bf))
-            hue = 360.0f + 60.0f * (gf - bf) / (max - min);
-          else if (max == gf)
-            hue = 120.0f + 60.0f * (bf - rf) / (max - min);
-          else
-            hue = 240.0f + 60.0f * (rf - gf) / (max - min); // max == b
-        }
-      }
-
-      dst->data[pos] = 0;
-      dst->data[pos + 1] = 0;
-      dst->data[pos + 2] = 0;
-
-      if (hmin < hmax) {
-        // segmentar apenas os pixeis
-        if ((hue >= hmin && hue <= hmax) && (saturation * 100 / 255 >= smin &&
-                                             saturation * 100 / 255 <= smax) &&
-            (value * 100 / 255 >= vmin && value * 100 / 255 <= vmax)) {
-          dst->data[pos] = 255;
-          dst->data[pos + 1] = 255;
-          dst->data[pos + 2] = 255;
-        }
-      } else {
-        if ((hue >= hmin || hue <= hmax) && (saturation * 100 / 255 >= smin &&
-                                             saturation * 100 / 255 <= smax) &&
-            (value * 100 / 255 >= vmin && value * 100 / 255 <= vmax)) {
-          dst->data[pos] = 255;
-          dst->data[pos + 1] = 255;
-          dst->data[pos + 2] = 255;
-        }
-      }
-    }
-  }
-  return 1;
-}
-
-int vc_rgb_to_hsv_b(IVC *src, IVC *dst) {
-  return vc_rgb_to_hsv_by_color(src, dst, 220, 230, 70, 100, 40, 260);
-}
-
-int vc_rgb_to_hsv_r(IVC *src, IVC *dst) {
-  return vc_rgb_to_hsv_by_color(src, dst, 350, 10, 60, 100, 50, 360);
-}
-
-int vc_rgb_to_hsv_y(IVC *src, IVC *dst) {
-  return vc_rgb_to_hsv_by_color(src, dst, 50, 60, 90, 100, 90, 360);
-}
 
 // Função auxiliar para comparar dois blobs por area.
 int compare_area(const void *a, const void *b) {
@@ -104,7 +15,7 @@ int compare_area(const void *a, const void *b) {
 int color_segmentation(IVC *src) {
   IVC *dst = vc_image_new(src->width, src->height, src->channels, src->levels);
   // sinais vermelhos
-  vc_rgb_to_hsv_r(src, dst);
+  vc_rgb_to_hsv_red(src, dst);
   if (!vc_write_image_info("out/red.ppm", dst)) {
     error("color_segmentation: vc_write_image_info failed\n");
   }

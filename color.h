@@ -3,6 +3,9 @@
 
 #include "myvc.h"
 
+#define MAX3(a, b, c) (a > b ? (a > c ? a : c) : (b > c ? b : c))
+#define MIN3(a, b, c) (a < b ? (a < c ? a : c) : (b < c ? b : c))
+
 // Cores básicas
 typedef enum {
   UnknownColor,
@@ -13,5 +16,9 @@ typedef enum {
 } Color;
 
 void vc_color_print(Color color);
+int vc_rgb_to_hsv_by_color(IVC *src, IVC *dst, int hmin, int hmax, int smin, int smax, int vmin, int vmax);
+int vc_rgb_to_hsv_blue(IVC *src, IVC *dst);
+int vc_rgb_to_hsv_red(IVC *src, IVC *dst);
+int vc_rgb_to_hsv_yellow(IVC *src, IVC *dst);
 
 #endif /* COLOR_H */
