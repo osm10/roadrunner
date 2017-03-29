@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "color.h"
 #include "myvc.h"
@@ -101,7 +102,7 @@ int process_file(const char *path) {
 #endif
 
   Sign sign = vc_identify_sign(color, shape);
-  if (sign.name == "UnknownSign") {
+  if (strncmp(sign.name, "UnknownSign", 51) == 0) {
     printf("\nSinal não reconhecido\n");
   } else {
     printf("\nSinal reconhecido: %s\n", sign.name);

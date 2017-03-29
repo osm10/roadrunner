@@ -127,15 +127,18 @@ Shape vc_find_shape(IVC *src) {
     fatal("vc_find_shape: vc_binary_blob_filter failed\n");
   }
 */
+
 #ifdef DEBUG
   printf("Number of labels (after filtering): %d\n", nblobs);
 #endif
 
   for (i = 0; i < nblobs; i++) {
+#ifdef DEBUG
     vc_binary_blob_print(&blobs[i]);
-    printf("\n");
     printf("blob %d is probably a ", blobs[i].label);
     vc_shape_print(vc_identify_shape(&blobs[i], 0.2f));
+    printf("\n");
+#endif
     vc_draw_mass_center(tmp[0], blobs[i].xc, blobs[i].yc, 255);
     vc_draw_boundary_box(tmp[0], blobs[i].x, blobs[i].x + blobs[i].width,
     blobs[i].y, blobs[i].y + blobs[i].height, 255);
