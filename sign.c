@@ -4,12 +4,26 @@
 #include <string.h>
 
 // Sinais de transito conhecidos.
-Sign known_signs[7] = {
+Sign known_signs[] = {
     {"Arrow Left", Circle, Blue}, {"Arrow Right", Circle, Blue},
     {"Arrow Up", Circle, Blue},   {"Highway", Square, Blue},
     {"Car", Square, Blue},        {"Forbidden", Circle, Red},
     {"Stop", Octagon, Red},
 };
+
+// Identifica um sinal dos sinais conhecidos.
+Sign vc_identify_sign(Color color, Shape shape) {
+  Sign sign = {"Unknown", UnknownShape, UnknownColor};
+  size_t nsigns = sizeof(known_signs) / sizeof(known_signs[0]);
+
+  for (size_t i = 0; i < nsigns; i++) {
+     sign = known_signs[i];
+     if ((sign.shape == shape) && (sign.color == color)) {
+       return sign;
+     }
+  }
+  return sign;
+}
 
 // Determina a cor dominante de uma dada imagem RGB.
 // - dst: imagem de saída segmentada para a cor dominante
@@ -87,12 +101,14 @@ Shape vc_find_shape(IVC *src) {
     tmp[i] = vc_grayscale_new(src->width, src->height);
   }
 
+/*
   if (!vc_gray_to_binary_otsu(src, tmp[0])) {
     fatal("vc_find_shape: vc_gray_to_binary_otsu failed\n");
   }
+*/
 
   int nblobs = 0; // número de blobs identificados, inicialmente a zero
-  OVC *blobs = vc_binary_blob_labelling(tmp[0], tmp[1], &nblobs);
+  OVC *blobs = vc_binary_blob_labelling(src, tmp[0], &nblobs);
   if (!blobs) {
     fatal("vc_find_shape: vc_binary_blob_labelling failed\n");
   }
@@ -101,15 +117,16 @@ Shape vc_find_shape(IVC *src) {
   printf("\nNumber of labels (before filtering): %d\n", nblobs);
 #endif
 
-  if (!vc_binary_blob_info(tmp[1], blobs, nblobs)) {
+  if (!vc_binary_blob_info(tmp[0], blobs, nblobs)) {
     fatal("vc_find_shape: vc_binary_blob_info failed\n");
   }
 
+/*
   nblobs = vc_binary_blob_filter(&blobs, nblobs, 30);
   if (nblobs == -1) {
     fatal("vc_find_shape: vc_binary_blob_filter failed\n");
   }
-
+*/
 #ifdef DEBUG
   printf("Number of labels (after filtering): %d\n", nblobs);
 #endif
@@ -117,14 +134,19 @@ Shape vc_find_shape(IVC *src) {
   for (i = 0; i < nblobs; i++) {
     vc_binary_blob_print(&blobs[i]);
     printf("\n");
-    printf("blob %d is probably a %d\n", blobs[i].label,
-           vc_identify_shape(&blobs[i], 0.2f));
-    // vc_draw_mass_center(tmp[1], blobs[i].xc, blobs[i].yc, 255);
-    // vc_draw_boundary_box(tmp[1], blobs[i].x, blobs[i].x + blobs[i].width,
-    // blobs[i].y, blobs[i].y + blobs[i].height, 255);
+    printf("blob %d is probably a ", blobs[i].label);
+    vc_shape_print(vc_identify_shape(&blobs[i], 0.2f));
+    vc_draw_mass_center(tmp[0], blobs[i].xc, blobs[i].yc, 255);
+    vc_draw_boundary_box(tmp[0], blobs[i].x, blobs[i].x + blobs[i].width,
+    blobs[i].y, blobs[i].y + blobs[i].height, 255);
   }
 
+  vc_write_image_info("out/blobbed.pgm", tmp[0]);
+
   free(blobs);
+  for (i = 0; i < ntemp_imgs; i++) {
+    vc_image_free(tmp[i]);
+  }
 
   return UnknownShape;
 }

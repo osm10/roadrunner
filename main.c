@@ -75,17 +75,40 @@ int shape_segmentation(IVC *src) {
 
 int process_file(const char *path) {
   IVC *src = vc_read_image((char *)path);
+  IVC *gray= vc_grayscale_new(src->width, src->height);
   IVC *dst = vc_rgb_new(src->width, src->height);
 
   Color color = vc_find_color(src, dst);
 #ifdef DEBUG
   vc_color_print(color);
-  vc_write_image_info("out/color_segm.ppm", dst);
+  if (!vc_write_image_info("out/color_segm.ppm", dst)) {
+     error("process_file: vc_write_image_info failed\n");
+  }
 #endif
 
-  // Shape shape = vc_find_shape(src);
+  if (!vc_rgb_to_gray(dst, gray)) {
+     error("process_file: convertion to grayscale failed\n");
+  }
+#ifdef DEBUG
+  if (!vc_write_image_info("out/color_segm.pgm", gray)) {
+     error("process_file: vc_write_image_info failed\n");
+  }
+#endif
+
+  Shape shape = vc_find_shape(gray);
+#ifdef DEBUG
+  vc_shape_print(shape);
+#endif
+
+  Sign sign = vc_identify_sign(color, shape);
+  if (sign.name == "UnknownSign") {
+    printf("\nSinal não reconhecido\n");
+  } else {
+    printf("\nSinal reconhecido: %s\n", sign.name);
+  }
 
   vc_image_free(src);
+  vc_image_free(gray);
   vc_image_free(dst);
 
   return 1;

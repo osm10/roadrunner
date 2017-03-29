@@ -45,18 +45,18 @@ Shape vc_identify_shape(OVC *blob, float tolerance) {
 void vc_shape_print(Shape shape) {
   switch (shape) {
   case Circle:
-    printf("Circle");
+    printf("Circle\n");
     break;
   case Square:
-    printf("Square");
+    printf("Square\n");
     break;
   case Rectangle:
-    printf("Rectangle");
+    printf("Rectangle\n");
     break;
   case Octagon:
-    printf("Octagon");
+    printf("Octagon\n");
     break;
   default:
-    printf("Unknown shape");
+    printf("Unknown shape\n");
   }
 }
