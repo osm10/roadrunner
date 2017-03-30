@@ -17,10 +17,10 @@ Sign vc_identify_sign(Color color, Shape shape) {
   size_t nsigns = sizeof(known_signs) / sizeof(known_signs[0]);
 
   for (size_t i = 0; i < nsigns; i++) {
-     sign = known_signs[i];
-     if ((sign.shape == shape) && (sign.color == color)) {
-       return sign;
-     }
+    sign = known_signs[i];
+    if ((sign.shape == shape) && (sign.color == color)) {
+      return sign;
+    }
   }
   return sign;
 }
@@ -101,11 +101,11 @@ Shape vc_find_shape(IVC *src) {
     tmp[i] = vc_grayscale_new(src->width, src->height);
   }
 
-/*
-  if (!vc_gray_to_binary_otsu(src, tmp[0])) {
-    fatal("vc_find_shape: vc_gray_to_binary_otsu failed\n");
-  }
-*/
+  /*
+    if (!vc_gray_to_binary_otsu(src, tmp[0])) {
+      fatal("vc_find_shape: vc_gray_to_binary_otsu failed\n");
+    }
+  */
 
   int nblobs = 0; // número de blobs identificados, inicialmente a zero
   OVC *blobs = vc_binary_blob_labelling(src, tmp[0], &nblobs);
@@ -141,7 +141,7 @@ Shape vc_find_shape(IVC *src) {
 #endif
     vc_draw_mass_center(tmp[0], blobs[i].xc, blobs[i].yc, 255);
     vc_draw_boundary_box(tmp[0], blobs[i].x, blobs[i].x + blobs[i].width,
-    blobs[i].y, blobs[i].y + blobs[i].height, 255);
+                         blobs[i].y, blobs[i].y + blobs[i].height, 255);
   }
 
   vc_write_image_info("out/blobbed.pgm", tmp[0]);
