@@ -24,8 +24,7 @@ Sign vc_identify_sign(Color color, Shape shape) {
   size_t nsigns = sizeof(known_signs) / sizeof(known_signs[0]);
 
   for (size_t i = 0; i < nsigns; i++) {
-    sign = known_signs[i];
-    if ((sign.shape == shape) && (sign.color == color)) {
+    if ((known_signs[i].shape == shape) && (known_signs[i].color == color)) {
       return sign;
     }
   }
