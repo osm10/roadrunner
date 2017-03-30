@@ -16,6 +16,8 @@ int process_file(const char *path) {
   IVC *edge = vc_grayscale_new(src->width, src->height);
   IVC *dst = vc_rgb_new(src->width, src->height);
 
+  printf("A identificar `%s'\n", path);
+
   Color color = vc_find_color(src, dst);
 #ifdef DEBUG
   if (!vc_write_image_info("out/color_segm.ppm", dst)) {
@@ -50,7 +52,7 @@ int process_file(const char *path) {
   if (strncmp(sign.name, "UnknownSign", 51) == 0) {
     printf("\nSinal não reconhecido\n");
   } else {
-    printf("\nSinal reconhecido\n");
+    printf("\nSinal reconhecido:\n");
     vc_sign_print(&sign);
   }
 

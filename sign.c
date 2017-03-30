@@ -150,7 +150,9 @@ Shape vc_find_shape(IVC *src) {
                          blobs[i].y, blobs[i].y + blobs[i].height, 255);
   }
 
+#ifdef DEBUG
   vc_write_image_info("out/blobbed.pgm", tmp[0]);
+#endif
 
   free(blobs);
   for (i = 0; i < ntemp_imgs; i++) {
