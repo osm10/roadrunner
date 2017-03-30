@@ -97,7 +97,7 @@ int process_file(const char *path) {
   }
 #endif
 
-  if (!vc_gray_edge_sobel(gray, edge, 40)) {
+  if (!vc_gray_edge_prewitt(gray, edge, 40)) {
     error("process_file: sobel edge detection failed\n");
   }
 #ifdef DEBUG
