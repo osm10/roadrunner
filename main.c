@@ -83,7 +83,6 @@ int process_file(const char *path) {
 
   Color color = vc_find_color(src, dst);
 #ifdef DEBUG
-  vc_color_print(color);
   if (!vc_write_image_info("out/color_segm.ppm", dst)) {
     error("process_file: vc_write_image_info failed\n");
   }
