@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "color.h"
+#include "edges.h"
 #include "myvc.h"
 #include "sign.h"
 #include "utils.h"
@@ -76,27 +77,37 @@ int shape_segmentation(IVC *src) {
 
 int process_file(const char *path) {
   IVC *src = vc_read_image((char *)path);
-  IVC *gray= vc_grayscale_new(src->width, src->height);
+  IVC *gray = vc_grayscale_new(src->width, src->height);
+  IVC *edge = vc_grayscale_new(src->width, src->height);
   IVC *dst = vc_rgb_new(src->width, src->height);
 
   Color color = vc_find_color(src, dst);
 #ifdef DEBUG
   vc_color_print(color);
   if (!vc_write_image_info("out/color_segm.ppm", dst)) {
-     error("process_file: vc_write_image_info failed\n");
+    error("process_file: vc_write_image_info failed\n");
   }
 #endif
 
   if (!vc_rgb_to_gray(dst, gray)) {
-     error("process_file: convertion to grayscale failed\n");
+    error("process_file: convertion to grayscale failed\n");
   }
 #ifdef DEBUG
   if (!vc_write_image_info("out/color_segm.pgm", gray)) {
-     error("process_file: vc_write_image_info failed\n");
+    error("process_file: vc_write_image_info failed\n");
   }
 #endif
 
-  Shape shape = vc_find_shape(gray);
+  if (!vc_gray_edge_sobel(gray, edge, 40)) {
+    error("process_file: sobel edge detection failed\n");
+  }
+#ifdef DEBUG
+  if (!vc_write_image_info("out/edge.pgm", edge)) {
+    error("process_file: vc_write_image_info failed\n");
+  }
+#endif
+
+  Shape shape = vc_find_shape(edge);
 #ifdef DEBUG
   vc_shape_print(shape);
 #endif
@@ -110,6 +121,7 @@ int process_file(const char *path) {
 
   vc_image_free(src);
   vc_image_free(gray);
+  vc_image_free(edge);
   vc_image_free(dst);
 
   return 1;

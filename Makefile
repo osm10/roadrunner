@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-std=c99 -Wall
 LIBS=-lm
 OUTDIR=out
-OBJS=main.o vc.o myvc.o utils.o shape.o color.o sign.o
+OBJS=main.o vc.o myvc.o utils.o shape.o color.o sign.o edges.o
 
 .PHONY: all debug release format tidy clean clean-all
 
