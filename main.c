@@ -16,10 +16,9 @@ int process_file(char *path) {
   IVC *gray = vc_grayscale_new(src->width, src->height);
   IVC *edge = vc_grayscale_new(src->width, src->height);
   IVC *dst = vc_rgb_new(src->width, src->height);
-  char *bname = basename(path);
-  const char *filename = get_filename_no_ext(bname);
+  const char *filename = get_filename_no_ext(basename(path));
 
-  printf("A identificar `%s'\n", basename(path));
+  printf("A identificar `%s'\n", path);
 
   Color color = vc_find_color(src, dst);
 #ifdef DEBUG
@@ -102,7 +101,6 @@ int main(int argc, char *argv[]) {
 
   // testamos se o argumento é um ficheiro
   if (is_regular_file(path)) {
-    printf("Processing: %s\n", path);
     if (!process_file(path)) {
       fprintf(stderr, "main: process_file failed\n");
       return 0;
@@ -124,7 +122,6 @@ int main(int argc, char *argv[]) {
       return 0;
     }
     for (size_t i = 0; i < nimages; i++) {
-      printf("Processing: %s\n", images[i]);
       if (!process_file(images[i])) {
         fprintf(stderr, "main: process_file on image `%s'\n", path);
       }
