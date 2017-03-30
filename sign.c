@@ -11,6 +11,13 @@ Sign known_signs[] = {
     {"Stop", Octagon, Red},
 };
 
+void vc_sign_print(Sign *sign) {
+  if (!sign)
+    return;
+  printf("Sinal: %s\tForma: %s\tCor: %s\n", sign->name,
+         vc_shape_name(sign->shape), vc_color_name(sign->color));
+}
+
 // Identifica um sinal dos sinais conhecidos.
 Sign vc_identify_sign(Color color, Shape shape) {
   Sign sign = {"Unknown", UnknownShape, UnknownColor};
@@ -114,19 +121,18 @@ Shape vc_find_shape(IVC *src) {
   }
 
 #ifdef DEBUG
-  printf("\nNumber of labels (before filtering): %d\n", nblobs);
+  printf("\nFiltering labels by area.\n");
+  printf("Number of labels (before filtering): %d\n", nblobs);
 #endif
 
   if (!vc_binary_blob_info(tmp[0], blobs, nblobs)) {
     fatal("vc_find_shape: vc_binary_blob_info failed\n");
   }
 
-/*
-  nblobs = vc_binary_blob_filter(&blobs, nblobs, 30);
+  nblobs = vc_binary_blob_filter(&blobs, nblobs, 100);
   if (nblobs == -1) {
     fatal("vc_find_shape: vc_binary_blob_filter failed\n");
   }
-*/
 
 #ifdef DEBUG
   printf("Number of labels (after filtering): %d\n", nblobs);
@@ -136,7 +142,7 @@ Shape vc_find_shape(IVC *src) {
 #ifdef DEBUG
     vc_binary_blob_print(&blobs[i]);
     printf("blob %d is probably a ", blobs[i].label);
-    vc_shape_print(vc_identify_shape(&blobs[i], 0.2f));
+    printf("%s\n", vc_shape_name(vc_identify_shape(&blobs[i], 0.2f)));
     printf("\n");
 #endif
     vc_draw_mass_center(tmp[0], blobs[i].xc, blobs[i].yc, 255);

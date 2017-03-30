@@ -1,6 +1,21 @@
 #include "shape.h"
 #include "myvc.h"
 
+char *vc_shape_name(Shape shape) {
+  switch (shape) {
+  case Circle:
+    return "Circle";
+  case Square:
+    return "Square";
+  case Rectangle:
+    return "Rectangle";
+  case Octagon:
+    return "Octagon";
+  default:
+    return "Unknown shape";
+  }
+}
+
 float vc_calculate_rectangle_area(OVC *blob) {
   if (!blob)
     return 0;
@@ -40,23 +55,4 @@ Shape vc_identify_shape(OVC *blob, float tolerance) {
     obj = Rectangle;
 
   return obj;
-}
-
-void vc_shape_print(Shape shape) {
-  switch (shape) {
-  case Circle:
-    printf("Circle\n");
-    break;
-  case Square:
-    printf("Square\n");
-    break;
-  case Rectangle:
-    printf("Rectangle\n");
-    break;
-  case Octagon:
-    printf("Octagon\n");
-    break;
-  default:
-    printf("Unknown shape\n");
-  }
 }

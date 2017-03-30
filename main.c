@@ -40,6 +40,8 @@ int shape_segmentation(IVC *src) {
   vc_binary_blob_info(dst, blobs, nblobs);
 
   printf("nblobs: %d\n", nblobs);
+  nblobs = vc_binary_blob_filter(&blobs, nblobs, 200);
+  printf("pos-filter nblobs: %d\n", nblobs);
 
   if (!vc_write_image_info("out/blobbed.pgm", dst)) {
     error("process_file2: vc_write_image_info failed\n");
@@ -63,8 +65,6 @@ int shape_segmentation(IVC *src) {
   if (!vc_write_image_info("out/bounded.pgm", dst)) {
     error("process_file2: vc_write_image_info failed\n");
   }
-
-  // nblobs = vc_binary_blob_filter(&blobs, nblobs, 30);
 
   vc_image_free(src);
   vc_image_free(gray);
@@ -108,14 +108,15 @@ int process_file(const char *path) {
 
   Shape shape = vc_find_shape(edge);
 #ifdef DEBUG
-  vc_shape_print(shape);
+  printf("Forma: %s\n", vc_shape_name(shape));
 #endif
 
   Sign sign = vc_identify_sign(color, shape);
   if (strncmp(sign.name, "UnknownSign", 51) == 0) {
     printf("\nSinal não reconhecido\n");
   } else {
-    printf("\nSinal reconhecido: %s\n", sign.name);
+    printf("\nSinal reconhecido\n");
+    vc_sign_print(&sign);
   }
 
   vc_image_free(src);
