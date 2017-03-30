@@ -103,9 +103,9 @@ long vc_rgb_to_hsv_blue(IVC *src, IVC *dst) {
 }
 
 long vc_rgb_to_hsv_red(IVC *src, IVC *dst) {
-  return vc_rgb_to_hsv_by_color(src, dst, 350, 10, 60, 100, 50, 360);
+  return vc_rgb_to_hsv_by_color(src, dst, 354, 6, 10, 100, 10, 100);
 }
 
 long vc_rgb_to_hsv_yellow(IVC *src, IVC *dst) {
-  return vc_rgb_to_hsv_by_color(src, dst, 50, 60, 90, 100, 90, 360);
+  return vc_rgb_to_hsv_by_color(src, dst, 50, 60, 90, 100, 90, 100);
 }
