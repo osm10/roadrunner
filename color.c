@@ -99,7 +99,7 @@ long vc_rgb_to_hsv_by_color(IVC *src, IVC *dst, int hmin, int hmax, int smin,
 }
 
 long vc_rgb_to_hsv_blue(IVC *src, IVC *dst) {
-  return vc_rgb_to_hsv_by_color(src, dst, 220, 230, 70, 100, 40, 260);
+  return vc_rgb_to_hsv_by_color(src, dst, 210, 260, 20, 100, 16, 80);
 }
 
 long vc_rgb_to_hsv_red(IVC *src, IVC *dst) {
