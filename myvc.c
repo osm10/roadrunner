@@ -1471,15 +1471,15 @@ OVC *vc_binary_blob_labelling(IVC *src, IVC *dst, int *nlabels) {
   int bytesperline = src->bytesperline;
   int channels = src->channels;
   int x, y, a, b;
-  long int i, size;
+  long int i, size = bytesperline * height;
   long int posX, posA, posB, posC, posD;
   int labeltable[256] = {0};
   int label = 1; // Etiqueta inicial.
   int num;
-  OVC *blobs; // Apontador para lista de blobs (objectos) que ser� retornada
-              // desta fun��o.
+  OVC *blobs = NULL; // Apontador para lista de blobs (objectos) que ser� retornada
+              // desta função.
 
-  // Verifica��o de erros
+  // Verificação de erros
   if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
     return 0;
   if ((src->width != dst->width) || (src->height != dst->height) ||
@@ -1488,19 +1488,20 @@ OVC *vc_binary_blob_labelling(IVC *src, IVC *dst, int *nlabels) {
   if (channels != 1)
     return NULL;
 
-  // Copia dados da imagem bin�ria para imagem grayscale
-  memcpy(datadst, datasrc, bytesperline * height);
+  // Copia dados da imagem binária para imagem grayscale
+  memcpy(datadst, datasrc, size);
 
-  // Todos os pix�is de plano de fundo devem obrigat�riamente ter valor 0
-  // Todos os pix�is de primeiro plano devem obrigat�riamente ter valor 255
-  // Ser�o atribu�das etiquetas no intervalo [1,254]
-  // Este algoritmo est� assim limitado a 254 labels
-  for (i = 0, size = bytesperline * height; i < size; i++) {
-    if (datadst[i] != 0)
+  // Todos os pixeis de plano de fundo devem obrigat�riamente ter valor 0
+  // Todos os pixeis de primeiro plano devem obrigat�riamente ter valor 255
+  // Serão atribuídas etiquetas no intervalo [1,254]
+  // Este algoritmo está assim limitado a 254 labels
+  for (i = 0; i < size; i++) {
+    if (datadst[i] != 0) {
       datadst[i] = 255;
+    }
   }
 
-  // Limpa os rebordos da imagem bin�ria
+  // Limpa os rebordos da imagem binária
   for (y = 0; y < height; y++) {
     datadst[y * bytesperline + 0 * channels] = 0;
     datadst[y * bytesperline + (width - 1) * channels] = 0;
@@ -1633,17 +1634,20 @@ OVC *vc_binary_blob_labelling(IVC *src, IVC *dst, int *nlabels) {
     }
   }
 
-  // Se n�o h� blobs
-  if (*nlabels == 0)
+  // Se não há blobs
+  if (*nlabels == 0) {
     return NULL;
+  }
 
   // Cria lista de blobs (objectos) e preenche a etiqueta
   blobs = (OVC *)calloc((*nlabels), sizeof(OVC));
   if (blobs != NULL) {
-    for (a = 0; a < (*nlabels); a++)
+    for (a = 0; a < (*nlabels); a++) {
       blobs[a].label = labeltable[a];
-  } else
+    }
+  } else {
     return NULL;
+  }
 
   return blobs;
 }

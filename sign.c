@@ -108,12 +108,6 @@ Shape vc_find_shape(IVC *src, const char *filename) {
     tmp[i] = vc_grayscale_new(src->width, src->height);
   }
 
-  /*
-    if (!vc_gray_to_binary_otsu(src, tmp[0])) {
-      fatal("vc_find_shape: vc_gray_to_binary_otsu failed\n");
-    }
-  */
-
   int nblobs = 0; // número de blobs identificados, inicialmente a zero
   OVC *blobs = vc_binary_blob_labelling(src, tmp[0], &nblobs);
   if (!blobs) {
