@@ -20,6 +20,6 @@ extern Sign known_signs[];
 Sign vc_identify_sign(Color color, Shape shape);
 void vc_sign_print(Sign *sign);
 Color vc_find_color(IVC *src, IVC* dst);
-Shape vc_find_shape(IVC *src);
+Shape vc_find_shape(IVC *src, const char *filename);
 
 #endif /* SIGN_H */

@@ -96,7 +96,7 @@ Color vc_find_color(IVC *src, IVC *dst) {
 }
 
 // Determina a forma do sinal.
-Shape vc_find_shape(IVC *src) {
+Shape vc_find_shape(IVC *src, const char *filename) {
   if (!src) {
     fatal("vc_find_shape: src == null\n");
   }
@@ -151,7 +151,7 @@ Shape vc_find_shape(IVC *src) {
   }
 
 #ifdef DEBUG
-  vc_write_image_info("out/blobbed.pgm", tmp[0]);
+  vc_write_image_info(concat(4, "out/", "blobbed_", filename, ".pgm"), tmp[0]);
 #endif
 
   free(blobs);

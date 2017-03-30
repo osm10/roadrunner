@@ -1,3 +1,4 @@
+#include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,13 +11,15 @@
 
 #define MAXIMAGES 50
 
-int process_file(const char *path) {
-  IVC *src = vc_read_image((char *)path);
+int process_file(char *path) {
+  IVC *src = vc_read_image(path);
   IVC *gray = vc_grayscale_new(src->width, src->height);
   IVC *edge = vc_grayscale_new(src->width, src->height);
   IVC *dst = vc_rgb_new(src->width, src->height);
+  char *bname = basename(path);
+  const char *filename = get_filename_no_ext(bname);
 
-  printf("A identificar `%s'\n", path);
+  printf("A identificar `%s'\n", basename(path));
 
   Color color = vc_find_color(src, dst);
 #ifdef DEBUG
@@ -43,7 +46,7 @@ int process_file(const char *path) {
   }
 #endif
 
-  Shape shape = vc_find_shape(edge);
+  Shape shape = vc_find_shape(edge, filename);
 #ifdef DEBUG
   printf("Forma: %s\n", vc_shape_name(shape));
 #endif
@@ -95,7 +98,7 @@ int main(int argc, char *argv[]) {
   }
 
   // caminho do ficheiro ou pasta dado pelo utilizador
-  const char *path = argv[1];
+  char *path = argv[1];
 
   // testamos se o argumento é um ficheiro
   if (is_regular_file(path)) {
