@@ -11,14 +11,20 @@ Sign known_signs[] = {
     {"Stop", Octagon, Red},
 };
 
+void vc_sign_print(Sign *sign) {
+  if (!sign)
+    return;
+  printf("Sinal: %s\tForma: %s\tCor: %s\n", sign->name,
+         vc_shape_name(sign->shape), vc_color_name(sign->color));
+}
+
 // Identifica um sinal dos sinais conhecidos.
 Sign vc_identify_sign(Color color, Shape shape) {
   Sign sign = {"Unknown", UnknownShape, UnknownColor};
   size_t nsigns = sizeof(known_signs) / sizeof(known_signs[0]);
 
   for (size_t i = 0; i < nsigns; i++) {
-    sign = known_signs[i];
-    if ((sign.shape == shape) && (sign.color == color)) {
+    if ((known_signs[i].shape == shape) && (known_signs[i].color == color)) {
       return sign;
     }
   }
@@ -89,7 +95,7 @@ Color vc_find_color(IVC *src, IVC *dst) {
 }
 
 // Determina a forma do sinal.
-Shape vc_find_shape(IVC *src) {
+Shape vc_find_shape(IVC *src, const char *filename) {
   if (!src) {
     fatal("vc_find_shape: src == null\n");
   }
@@ -101,12 +107,6 @@ Shape vc_find_shape(IVC *src) {
     tmp[i] = vc_grayscale_new(src->width, src->height);
   }
 
-  /*
-    if (!vc_gray_to_binary_otsu(src, tmp[0])) {
-      fatal("vc_find_shape: vc_gray_to_binary_otsu failed\n");
-    }
-  */
-
   int nblobs = 0; // número de blobs identificados, inicialmente a zero
   OVC *blobs = vc_binary_blob_labelling(src, tmp[0], &nblobs);
   if (!blobs) {
@@ -114,19 +114,18 @@ Shape vc_find_shape(IVC *src) {
   }
 
 #ifdef DEBUG
-  printf("\nNumber of labels (before filtering): %d\n", nblobs);
+  printf("\nFiltering labels by area.\n");
+  printf("Number of labels (before filtering): %d\n", nblobs);
 #endif
 
   if (!vc_binary_blob_info(tmp[0], blobs, nblobs)) {
     fatal("vc_find_shape: vc_binary_blob_info failed\n");
   }
 
-/*
-  nblobs = vc_binary_blob_filter(&blobs, nblobs, 30);
+  nblobs = vc_binary_blob_filter(&blobs, nblobs, 100);
   if (nblobs == -1) {
     fatal("vc_find_shape: vc_binary_blob_filter failed\n");
   }
-*/
 
 #ifdef DEBUG
   printf("Number of labels (after filtering): %d\n", nblobs);
@@ -136,7 +135,7 @@ Shape vc_find_shape(IVC *src) {
 #ifdef DEBUG
     vc_binary_blob_print(&blobs[i]);
     printf("blob %d is probably a ", blobs[i].label);
-    vc_shape_print(vc_identify_shape(&blobs[i], 0.2f));
+    printf("%s\n", vc_shape_name(vc_identify_shape(&blobs[i], 0.2f)));
     printf("\n");
 #endif
     vc_draw_mass_center(tmp[0], blobs[i].xc, blobs[i].yc, 255);
@@ -144,7 +143,9 @@ Shape vc_find_shape(IVC *src) {
                          blobs[i].y, blobs[i].y + blobs[i].height, 255);
   }
 
-  vc_write_image_info("out/blobbed.pgm", tmp[0]);
+#ifdef DEBUG
+  vc_write_image_info(concat(4, "out/", "blobbed_", filename, ".pgm"), tmp[0]);
+#endif
 
   free(blobs);
   for (i = 0; i < ntemp_imgs; i++) {

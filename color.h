@@ -15,7 +15,7 @@ typedef enum {
   Green,
 } Color;
 
-void vc_color_print(Color color);
+char* vc_color_name(Color color);
 long vc_rgb_to_hsv_by_color(IVC *src, IVC *dst, int hmin, int hmax, int smin, int smax, int vmin, int vmax);
 long vc_rgb_to_hsv_blue(IVC *src, IVC *dst);
 long vc_rgb_to_hsv_red(IVC *src, IVC *dst);

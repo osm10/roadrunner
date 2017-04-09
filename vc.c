@@ -9,7 +9,6 @@
 
 #include "vc.h"
 #include <ctype.h>
-#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,8 +31,8 @@ IVC *vc_image_new(int width, int height, int channels, int levels) {
   image->channels = channels;
   image->levels = levels;
   image->bytesperline = image->width * image->channels;
-  image->data = (unsigned char *)malloc(image->width * image->height *
-                                        image->channels * sizeof(char));
+  image->data = (unsigned char *)calloc(image->width * image->height *
+                                        image->channels, sizeof(char));
 
   if (image->data == NULL) {
     return vc_image_free(image);

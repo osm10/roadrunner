@@ -12,7 +12,7 @@ typedef enum {
   Octagon,
 } Shape;
 
-void vc_shape_print(Shape shape);
+char* vc_shape_name(Shape shape);
 float vc_calculate_circle_area(OVC *blob);
 float vc_calculate_rectange_area(OVC *blob);
 Shape vc_identify_shape(OVC *blob, float tolerance);

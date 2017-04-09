@@ -1,21 +1,17 @@
 #include "color.h"
 
-void vc_color_print(Color color) {
+char *vc_color_name(Color color) {
   switch (color) {
   case Red:
-    printf("Red\n");
-    break;
+    return "Red";
   case Blue:
-    printf("Blue\n");
-    break;
+    return "Blue";
   case Yellow:
-    printf("Yellow\n");
-    break;
+    return "Yellow";
   case Green:
-    printf("Green\n");
-    break;
+    return "Green";
   default:
-    printf("Unknown color\n");
+    return "Unknown color";
   }
 }
 

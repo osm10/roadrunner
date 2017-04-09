@@ -1,3 +1,4 @@
+#include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,79 +11,18 @@
 
 #define MAXIMAGES 50
 
-// Função auxiliar para comparar dois blobs por area.
-int compare_area(const void *a, const void *b) {
-  return (((OVC *)b)->area - (((OVC *)a)->area));
-}
-
-int shape_segmentation(IVC *src) {
-  IVC *gray = vc_grayscale_new(src->width, src->height);
-  IVC *segm = vc_grayscale_new(src->width, src->height);
-  IVC *dst = vc_grayscale_new(src->width, src->height);
-
-  if (!vc_rgb_to_gray(src, gray))
-    return 0;
-  if (!vc_write_image_info("out/gray.pgm", gray)) {
-    error("process_file2: vc_write_image_info failed\n");
-  }
-
-  if (!vc_gray_to_binary_otsu(gray, segm))
-    return 0;
-  if (!vc_write_image_info("out/segm.pgm", segm)) {
-    error("process_file2: vc_write_image_info failed\n");
-  }
-
-  int nblobs = 0;
-  OVC *blobs = vc_binary_blob_labelling(segm, dst, &nblobs);
-  if (!blobs)
-    return 0;
-
-  vc_binary_blob_info(dst, blobs, nblobs);
-
-  printf("nblobs: %d\n", nblobs);
-
-  if (!vc_write_image_info("out/blobbed.pgm", dst)) {
-    error("process_file2: vc_write_image_info failed\n");
-  }
-
-  qsort(blobs, nblobs, sizeof(OVC),
-        compare_area); // filtrar por area decrescente
-
-  // saltamos o maior (i=1)
-  for (int i = 0; i < nblobs; i++) {
-    OVC *blob = &blobs[i];
-    vc_binary_blob_print(blob);
-    printf("Circularity: %.2f\n\n", blob->circularity);
-    if (!vc_draw_boundary_box(dst, blob->x, blob->x + blob->width, blob->y,
-                              blob->y + blob->height, 255))
-      return 0;
-    if (!vc_draw_mass_center(dst, blob->xc, blob->yc, 255))
-      return 0;
-  }
-
-  if (!vc_write_image_info("out/bounded.pgm", dst)) {
-    error("process_file2: vc_write_image_info failed\n");
-  }
-
-  // nblobs = vc_binary_blob_filter(&blobs, nblobs, 30);
-
-  vc_image_free(src);
-  vc_image_free(gray);
-  vc_image_free(segm);
-  vc_image_free(dst);
-  free(blobs);
-
-  return 1;
-}
-
-int process_file(const char *path) {
-  IVC *src = vc_read_image((char *)path);
+int process_file(char *path) {
+  IVC *src = vc_read_image(path);
   IVC *gray = vc_grayscale_new(src->width, src->height);
   IVC *edge = vc_grayscale_new(src->width, src->height);
   IVC *dst = vc_rgb_new(src->width, src->height);
+  const char *filename = get_filename_no_ext(basename(path));
+
+  printf("A identificar `%s'\n", path);
 
   Color color = vc_find_color(src, dst);
 #ifdef DEBUG
+  printf("Cor: %s\n", vc_color_name(color));
   if (!vc_write_image_info("out/color_segm.ppm", dst)) {
     error("process_file: vc_write_image_info failed\n");
   }
@@ -97,7 +37,7 @@ int process_file(const char *path) {
   }
 #endif
 
-  if (!vc_gray_edge_sobel(gray, edge, 40)) {
+  if (!vc_gray_edge_prewitt(gray, edge, 40)) {
     error("process_file: sobel edge detection failed\n");
   }
 #ifdef DEBUG
@@ -106,16 +46,17 @@ int process_file(const char *path) {
   }
 #endif
 
-  Shape shape = vc_find_shape(edge);
+  Shape shape = vc_find_shape(edge, filename);
 #ifdef DEBUG
-  vc_shape_print(shape);
+  printf("Forma: %s\n", vc_shape_name(shape));
 #endif
 
   Sign sign = vc_identify_sign(color, shape);
   if (strncmp(sign.name, "UnknownSign", 51) == 0) {
     printf("\nSinal não reconhecido\n");
   } else {
-    printf("\nSinal reconhecido: %s\n", sign.name);
+    printf("\nSinal reconhecido:\n");
+    vc_sign_print(&sign);
   }
 
   vc_image_free(src);
@@ -157,11 +98,10 @@ int main(int argc, char *argv[]) {
   }
 
   // caminho do ficheiro ou pasta dado pelo utilizador
-  const char *path = argv[1];
+  char *path = argv[1];
 
   // testamos se o argumento é um ficheiro
   if (is_regular_file(path)) {
-    printf("Processing: %s\n", path);
     if (!process_file(path)) {
       fprintf(stderr, "main: process_file failed\n");
       return 0;
@@ -183,7 +123,6 @@ int main(int argc, char *argv[]) {
       return 0;
     }
     for (size_t i = 0; i < nimages; i++) {
-      printf("Processing: %s\n", images[i]);
       if (!process_file(images[i])) {
         fprintf(stderr, "main: process_file on image `%s'\n", path);
       }
