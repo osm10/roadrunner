@@ -1729,7 +1729,7 @@ int vc_binary_blob_info(IVC *src, OVC *blobs, int nblobs) {
     blobs[i].yc = sumy / (blobs[i].area > 1 ? blobs[i].area : 1);
 
     // Circularidade
-    blobs[i].circularity = (12.5663706 * blobs[i].area) /
+    blobs[i].circularity = (12.5663706 * (3.14*(blobs[i].width/2*blobs[i].width/2)))/
                            (blobs[i].perimeter * blobs[i].perimeter);
   }
 
