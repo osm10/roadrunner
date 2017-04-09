@@ -41,8 +41,9 @@ Shape vc_identify_shape(OVC *blob, float tolerance) {
     return obj;
 
 /*
-  float area_circle = vc_calculate_circle_area(blob);
-  float area_rectangle = vc_calculate_rectangle_area(blob);
+  float area_circle = vc_calfd
+  culate_circle_area(blob);
+  mafloat area_rectangle = vc_calculate_rectangle_area(blob);
 
   float upper_circ = area_circle + (area_circle * tolerance);
   float lower_circ = area_circle - (area_circle * tolerance);

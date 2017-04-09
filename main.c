@@ -11,6 +11,56 @@
 
 #define MAXIMAGES 50
 
+int super_oliver(char *path) {
+  IVC *src = vc_read_image(path);
+  IVC *tmp = vc_grayscale_new(src->width,src->height);
+  char *filename = "yeah";
+  int i;
+
+ int nblobs = 0; // número de blobs identificados, inicialmente a zero
+  OVC *blobs = vc_binary_blob_labelling(src, tmp, &nblobs);
+  if (!blobs) {
+    fatal("vc_find_shape: vc_binary_blob_labelling failed\n");
+  }
+
+#ifdef DEBUG
+  printf("\nFiltering labels by area.\n");
+  printf("Number of labels (before filtering): %d\n", nblobs);
+#endif
+
+  if (!vc_binary_blob_info(tmp, blobs, nblobs)) {
+    fatal("vc_find_shape: vc_binary_blob_info failed\n");
+  }
+
+  nblobs = vc_binary_blob_filter(&blobs, nblobs, 400);
+  if (nblobs == -1) {
+    fatal("vc_find_shape: vc_binary_blob_filter failed\n");
+  }
+
+#ifdef DEBUG
+  printf("Number of labels (after filtering): %d\n", nblobs);
+#endif
+
+  for (i = 0; i < nblobs; i++) {
+#ifdef DEBUG
+    vc_binary_blob_print(&blobs[i]);
+    printf("blob %d is probably a ", blobs[i].label);
+    printf("%s\n", vc_shape_name(vc_identify_shape(&blobs[i], 0.2f)));
+    printf("\n");
+#endif
+    vc_draw_mass_center(tmp, blobs[i].xc, blobs[i].yc, 255);
+    vc_draw_boundary_box(tmp, blobs[i].x, blobs[i].x + blobs[i].width,
+                         blobs[i].y, blobs[i].y + blobs[i].height, 255);
+  }
+
+  vc_write_image_info(concat(4, "out/", "blobbed_", filename, ".pgm"), tmp);
+
+
+  free(blobs);
+      vc_image_free(tmp);
+  return 1;
+}
+
 int process_file(char *path) {
   IVC *src = vc_read_image(path);
   IVC *gray = vc_grayscale_new(src->width, src->height);
@@ -103,7 +153,7 @@ int main(int argc, char *argv[]) {
 
   // testamos se o argumento é um ficheiro
   if (is_regular_file(path)) {
-    if (!process_file(path)) {
+    if (!super_oliver(path)) {
       fprintf(stderr, "main: process_file failed\n");
       return 0;
     }
@@ -124,7 +174,7 @@ int main(int argc, char *argv[]) {
       return 0;
     }
     for (size_t i = 0; i < nimages; i++) {
-      if (!process_file(images[i])) {
+      if (!super_oliver(images[i])) {
         fprintf(stderr, "main: process_file on image `%s'\n", path);
       }
       getchar();
