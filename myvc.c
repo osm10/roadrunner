@@ -1473,7 +1473,8 @@ OVC *vc_binary_blob_labelling(IVC *src, IVC *dst, int *nlabels) {
   int x, y, a, b;
   long int i, size = bytesperline * height;
   long int posX, posA, posB, posC, posD;
-  int labeltable[256] = {0};
+  int labeltable[1000];
+  memset(labeltable, 0, sizeof(labeltable));
   int label = 1; // Etiqueta inicial.
   int num;
   OVC *blobs = NULL; // Apontador para lista de blobs (objectos) que ser� retornada
