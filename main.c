@@ -63,6 +63,7 @@ int process_file(char *path) {
   vc_image_free(gray);
   vc_image_free(edge);
   vc_image_free(dst);
+  free((char*)filename);
 
   return 1;
 }
