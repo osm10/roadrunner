@@ -123,7 +123,7 @@ Shape vc_find_shape(IVC *src, const char *filename) {
     fatal("vc_find_shape: vc_binary_blob_info failed\n");
   }
 
-  nblobs = vc_binary_blob_filter(&blobs, nblobs, 100);
+  nblobs = vc_binary_blob_filter(&blobs, nblobs, 400);
   if (nblobs == -1) {
     fatal("vc_find_shape: vc_binary_blob_filter failed\n");
   }

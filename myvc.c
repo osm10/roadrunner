@@ -1405,6 +1405,7 @@ int vc_binary_blob_print(OVC *blob) {
   printf("perimeter: %d\n", blob->perimeter);
   printf("width: %d\theight: %d\n", blob->width, blob->height);
   printf("x: %d\ty: %d\n", blob->x, blob->y);
+  printf("circularity: %.2f\n", blob->circularity);
 
   return 1;
 }
@@ -1728,7 +1729,7 @@ int vc_binary_blob_info(IVC *src, OVC *blobs, int nblobs) {
     blobs[i].yc = sumy / (blobs[i].area > 1 ? blobs[i].area : 1);
 
     // Circularidade
-    blobs[i].circularity = (12.5663706 * blobs[i].width * blobs[i].height) /
+    blobs[i].circularity = (12.5663706 * blobs[i].area) /
                            (blobs[i].perimeter * blobs[i].perimeter);
   }
 
@@ -1927,3 +1928,9 @@ int vc_gray_edge_canny(IVC *src, IVC *dst) {
 
   return 1;
 }
+
+// Verifica se um blob 1 contem outro blob 2 (Se o blob 2 está dentro do blob 1).
+/*
+int vc_blob_contains_blob(Blob *b1, Blob *b2) {
+}
+}*/

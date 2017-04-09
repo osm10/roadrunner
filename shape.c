@@ -40,6 +40,7 @@ Shape vc_identify_shape(OVC *blob, float tolerance) {
   if (tolerance < 0.0 || tolerance > 1.0)
     return obj;
 
+/*
   float area_circle = vc_calculate_circle_area(blob);
   float area_rectangle = vc_calculate_rectangle_area(blob);
 
@@ -48,10 +49,11 @@ Shape vc_identify_shape(OVC *blob, float tolerance) {
 
   float upper_rect = area_rectangle + (area_rectangle * tolerance);
   float lower_rect = area_rectangle - (area_rectangle * tolerance);
+*/
 
-  if (blob->area >= lower_circ && blob->area <= upper_circ)
+  if (blob->circularity > 0.8)
     obj = Circle;
-  else if (blob->area >= lower_rect && blob->area <= upper_rect)
+  else
     obj = Rectangle;
 
   return obj;
