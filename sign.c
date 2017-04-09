@@ -20,11 +20,12 @@ void vc_sign_print(Sign *sign) {
 
 // Identifica um sinal dos sinais conhecidos.
 Sign vc_identify_sign(Color color, Shape shape) {
-  Sign sign = {"Unknown", UnknownShape, UnknownColor};
+  Sign sign = {"Unknown", shape, color};
   size_t nsigns = sizeof(known_signs) / sizeof(known_signs[0]);
 
   for (size_t i = 0; i < nsigns; i++) {
     if ((known_signs[i].shape == shape) && (known_signs[i].color == color)) {
+      sign.name = known_signs[i].name;
       return sign;
     }
   }
